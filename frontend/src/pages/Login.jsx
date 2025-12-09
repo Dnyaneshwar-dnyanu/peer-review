@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 
 function Login() {
-  const [form, setForm] = useState({ usn: "", password: "" });
+  const [form, setForm] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,7 +19,15 @@ function Login() {
     let data = await res.json();
     
     if (data.auth) {
-      window.location.href = '/';
+      if (data.user.role === 'student') {
+        window.location.href = '/students/dashboard';
+      }
+      else if(data.user.role === 'admin') {
+        window.location.href = '/admin/dashboard';
+      }
+      else {
+        window.location.href = '/';
+      }
     }
     else {
       console.log(data);
@@ -45,15 +53,15 @@ function Login() {
         {/* Form */}
         <div className="flex flex-col gap-5 text-white">
 
-          {/* USN Input with Icon */}
+          {/* Email Input with Icon */}
           <div className="relative">
             <FaUser className="absolute left-3 top-3 text-white/70 text-lg" />
             <input
-              type="text"
-              name="usn"
-              value={form.usn}
+              type="email"
+              name="email"
+              value={form.email}
               onChange={handleChange}
-              placeholder="USN"
+              placeholder="Email"
               className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 
                          focus:bg-white/30 outline-none"
             />

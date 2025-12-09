@@ -8,10 +8,10 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 
 router.get('/validateUser', validateUser, (req, res) => {
-     console.log("user logged in");
      res.send({ auth: true, user: req.user });
 });
 
 router.get('/logoutUser', logoutUser);
+
 
 module.exports = router;

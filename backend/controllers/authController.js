@@ -30,10 +30,10 @@ module.exports.registerUser = async (req, res) => {
 
 module.exports.loginUser = async (req, res) => {
      
-     let user = await userModel.findOne({ usn: req.body.usn });
+     let user = await userModel.findOne({ email: req.body.email });
      
      if(user) {
-          let { usn, password } = req.body;
+          let { email, password } = req.body;
           bcrypt.compare(password, user.password, (err, result) => {
                if(result) {
                     let token = generateToken(user);
@@ -44,7 +44,7 @@ module.exports.loginUser = async (req, res) => {
           })
           return;
      }
-     return res.send({ auth: false, msg: "user usn is wrong"});
+     return res.send({ auth: false, msg: "user email is wrong"});
 }
 
 module.exports.logoutUser = async (req, res) => {

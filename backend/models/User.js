@@ -5,7 +5,29 @@ let userSchema = mongoose.Schema({
      usn: String,
      email: String,
      password: String,
-     role: String
+
+     // "student" or "admin"
+     role: {
+          type: String,
+          enum: ['student', 'admin'],
+          required: true
+     },
+
+     // Only students will use this
+     projects: [
+          {
+               type: mongoose.Schema.Types.ObjectId,
+               ref: 'Project'
+          }
+     ],
+
+     // Only admins will use this
+     roomsCreated: [
+          {
+               type: mongoose.Schema.Types.ObjectId,
+               ref: 'Room'
+          }
+     ]
 });
 
-module.exports = mongoose.model('user', userSchema);
+module.exports = mongoose.model('User', userSchema);

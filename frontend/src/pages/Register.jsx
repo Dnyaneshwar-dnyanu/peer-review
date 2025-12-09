@@ -6,9 +6,13 @@ function Register() {
      let submitRef = useRef(null);
      const [auth, setAuth] = useState(null);
      const [user, setUser] = useState(null);
+     const [userRole, setUserRole] = useState('student');
 
      const handleChange = (e) => {
           setForm({ ...form, [e.target.name]: e.target.value });
+          if (e.target.name === 'role') {
+               setUserRole(e.target.value);
+          }
      }
 
      const register = async () => {
@@ -20,11 +24,16 @@ function Register() {
           });
 
           let data = await res.json();
-          
+
           if (data.auth) {
                setAuth(true);
                setUser(data.user);
-               window.location.href = '/';
+               if(data.user.role === 'student') {
+                    window.location.href = '/students/dashboard';
+               }
+               else if (data.user.role === 'admin') {
+                    window.location.href = '/admin/dashboard';
+               }
           }
           else {
                console.log(data);
@@ -54,14 +63,28 @@ function Register() {
                               className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
                          />
 
-                         <input
-                              type="text"
-                              name="usn"
-                              value={form.usn}
+                         <select
+                              name="role"
+                              value={form.role}
                               onChange={handleChange}
-                              placeholder="USN"
-                              className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
-                         />
+                              className="w-full p-3 rounded-lg bg-white/20 border border-white/30 focus:bg-white/30 outline-none"
+                         >
+                              <option value="" disabled>Select your role</option>
+                              <option value="student" className="text-black">Student</option>
+                              <option value="admin" className="text-black">Teacher</option>
+                         </select>
+
+                         {
+                              userRole === 'student' &&
+                              <input
+                                   type="text"
+                                   name="usn"
+                                   value={form.usn}
+                                   onChange={handleChange}
+                                   placeholder="USN"
+                                   className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
+                              />
+                         }
 
                          <input
                               type="email"
@@ -71,17 +94,6 @@ function Register() {
                               placeholder="Email Address"
                               className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
                          />
-
-                         <select
-                              name="role"
-                              value={form.role}
-                              onChange={handleChange}
-                              className="w-full p-3 rounded-lg bg-white/20 border border-white/30 focus:bg-white/30 outline-none"
-                         >
-                              <option value="" disabled>Select your role</option>
-                              <option value="student" className="text-black">Student</option>
-                              <option value="teacher" className="text-black">Teacher</option>
-                         </select>
 
                          <input
                               type="password"

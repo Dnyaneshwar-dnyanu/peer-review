@@ -3,7 +3,8 @@ const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const userRouter = require('./routes/userRouter');
+const authRouter = require('./routes/authRouter');
+const adminRouter = require('./routes/adminRouter')
 require('dotenv').config();
 const connectDB = require('./config/db');
 
@@ -18,10 +19,12 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use('/api/auth', userRouter);
+app.use('/api/auth', authRouter);
+
+app.use('/admin', adminRouter);
 
 app.get('/', (req, res) => {
      res.send("Hello Brother");
-})
+});
 
 app.listen(3000);

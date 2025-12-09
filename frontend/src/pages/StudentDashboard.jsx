@@ -4,31 +4,8 @@ import { useEffect, useState } from "react";
 import { FaHome, FaTasks, FaUserGraduate, FaSignOutAlt } from "react-icons/fa";
 import { MdAssessment } from "react-icons/md";
 
-function Dashboard() {
-  const [auth, setAuth] = useState(null);
-  const [user, setUser] = useState(null);
+function StudentDashboard() {
   const logoutBtn = useRef(null);
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    let res = await fetch('http://localhost:3000/api/auth/validateUser', {
-      method: 'GET',
-      credentials: "include"
-    });
-
-    let data = await res.json();
-
-    if (!data.auth) {
-      window.location.href = '/login';
-    }
-    else {
-      setAuth(true);
-      setUser(data.user);
-    }
-  }
 
   const logout = async () => {
     const res = await fetch('http://localhost:3000/api/auth/logoutUser', {
@@ -39,13 +16,9 @@ function Dashboard() {
     let data = await res.json();
 
     if (!data.auth) {
-      setAuth(false);
-      setUser(null);
       window.location.href = '/Login';
     }
   }
-
-  if(!auth) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-500 flex">
@@ -77,7 +50,7 @@ function Dashboard() {
       <div className="flex-1 p-10 text-white">
 
         {/* Greeting Section */}
-        <h1 className="text-4xl font-bold mb-2">Welcome back, { user.name.split(' ')[0] }!</h1>
+        {/* <h1 className="text-4xl font-bold mb-2">Welcome back, { user.name.split(' ')[0] }!</h1> */}
         <p className="text-white/80 mb-10">Here’s your dashboard overview</p>
 
         {/* Stats Cards */}
@@ -90,24 +63,6 @@ function Dashboard() {
           ">
             <h3 className="text-xl font-semibold">Total Projects</h3>
             <p className="text-4xl font-bold mt-4">4</p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="
-            p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
-            hover:scale-[1.03] transition transform shadow-lg
-          ">
-            <h3 className="text-xl font-semibold">Reviews Done</h3>
-            <p className="text-4xl font-bold mt-4">12</p>
-          </div>
-
-          {/* Card 3 */}
-          <div className="
-            p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
-            hover:scale-[1.03] transition transform shadow-lg
-          ">
-            <h3 className="text-xl font-semibold">Pending Reviews</h3>
-            <p className="text-4xl font-bold mt-4">3</p>
           </div>
 
         </div>
@@ -153,4 +108,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default StudentDashboard;
