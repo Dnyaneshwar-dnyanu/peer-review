@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
@@ -17,20 +21,22 @@ function Login() {
     });
 
     let data = await res.json();
-    
+
     if (data.auth) {
       if (data.user.role === 'student') {
-        window.location.href = '/students/dashboard';
+        navigate('/student/dashboard');
       }
-      else if(data.user.role === 'admin') {
-        window.location.href = '/admin/dashboard';
+      else if (data.user.role === 'admin') {
+        navigate('/admin/dashboard');
       }
       else {
-        window.location.href = '/';
+        navigate('/login');
       }
+      toast.success("logged in successfully!");
     }
     else {
-      console.log(data);
+      toast.error(data.message);
+      setForm({ email: "", password: "" });
     }
   };
 
@@ -41,7 +47,7 @@ function Login() {
         w-full max-w-md p-10 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-xl 
         bg-white/10 transform transition duration-500 hover:scale-[1.02] hover:shadow-xl
       ">
-        
+
         {/* Heading */}
         <h2 className="text-3xl font-bold text-white text-center mb-6">
           Welcome Back
@@ -51,7 +57,7 @@ function Login() {
         </p>
 
         {/* Form */}
-        <div className="flex flex-col gap-5 text-white">
+        <div className="flex flex-col gap-4 text-white">
 
           {/* Email Input with Icon */}
           <div className="relative">
@@ -61,6 +67,7 @@ function Login() {
               name="email"
               value={form.email}
               onChange={handleChange}
+              autoComplete="off"
               placeholder="Email"
               className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 
                          focus:bg-white/30 outline-none"
@@ -75,16 +82,19 @@ function Login() {
               name="password"
               value={form.password}
               onChange={handleChange}
+              autoComplete="off"
               placeholder="Password"
               className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 
                          focus:bg-white/30 outline-none"
             />
           </div>
 
+          <Link to="/login/forgotpassword" className="text-end hover:underline">Forgot password?</Link>
+
           {/* Login Button */}
           <button
             onClick={login}
-            className="w-full py-3 mt-2 bg-white text-indigo-600 rounded-lg font-semibold 
+            className="w-full py-3 bg-white text-indigo-600 rounded-lg font-semibold 
                        hover:bg-gray-200 transition"
           >
             Login

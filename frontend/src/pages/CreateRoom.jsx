@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function CreateRoom() {
+     const navigate = useNavigate();
      const [form, setForm] = useState({
           roomName: "",
           semester: "",
@@ -16,7 +19,10 @@ function CreateRoom() {
                body: JSON.stringify(form)
           });
 
-          if (res.status === 200) window.location.href = '/admin/dashboard';
+          if (res.status === 200) {
+               toast.success("Classroom created successfully!")
+               navigate('/admin/dashboard');
+          }
      }
 
      const handleChange = (e) => {
@@ -45,6 +51,7 @@ function CreateRoom() {
                               name="roomName"
                               value={form.roomName}
                               onChange={handleChange}
+                              autoComplete="off"
                               placeholder="Room Name (Ex: AI Lab, DBMS Section A)"
                               className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 
                        border border-white/30 focus:bg-white/30 outline-none"
@@ -86,6 +93,7 @@ function CreateRoom() {
                               name="maxMarks"
                               value={form.maxMarks}
                               onChange={handleChange}
+                              autoComplete="off"
                               placeholder="Maximum Marks"
                               className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 
                        border border-white/30 focus:bg-white/30 outline-none"

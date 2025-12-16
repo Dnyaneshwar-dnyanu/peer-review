@@ -4,7 +4,7 @@ function RoomCard({ Room }) {
      const navigate = useNavigate();
      
      return (
-          <div className="p-6 max-w-72 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:scale-[1.02] transition shadow-md">
+          <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:scale-[1.02] transition shadow-md">
                <h3 className="text-xl font-bold mb-2">{Room.roomName}</h3>
 
                <p className="text-white/80 text-sm">
@@ -26,12 +26,10 @@ function RoomCard({ Room }) {
                     </span>
                </p>
 
-                    <button onClick={() => navigate(`/room/${Room._id}`)} className="mt-4 bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-200">
+                    <button onClick={() => navigate(`/admin/room/${Room._id}`)} className="mt-4 bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-200">
                          View Classroom
                     </button>
           </div>
-
-
      )
 }
 

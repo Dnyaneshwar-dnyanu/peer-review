@@ -1,15 +1,11 @@
 const mongoose = require('mongoose');
 
 const reviewSchema = mongoose.Schema({
-     roomId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Room'
-     },
-     projectId: {
+     projectID: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Project'
      },
-     reviewerId: {
+     reviewerID: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'User'
      },
@@ -24,4 +20,4 @@ const reviewSchema = mongoose.Schema({
      }
 });
 
-module.exports = mongoose.model('Review', reviewSchema);
+module.exports = mongoose.model('Reviewer', reviewSchema);

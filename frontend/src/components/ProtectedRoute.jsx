@@ -31,8 +31,6 @@ function ProtectedRoute({ children, allowedRoles }) {
      if (loading) return <p>loading....</p>
 
      if (allowedRoles && !allowedRoles.includes(userRole) || !userRole) {
-          console.log('User entered')
-          console.log(allowedRoles)
           return <Navigate to='/login' replace />;
      }
 

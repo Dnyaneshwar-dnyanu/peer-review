@@ -4,7 +4,9 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const authRouter = require('./routes/authRouter');
-const adminRouter = require('./routes/adminRouter')
+const adminRouter = require('./routes/adminRouter');
+const userRouter = require('./routes/userRouter');
+const projectRouter = require('./routes/projectRouter');
 require('dotenv').config();
 const connectDB = require('./config/db');
 
@@ -22,6 +24,10 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 
 app.use('/admin', adminRouter);
+
+app.use('/student', userRouter);
+
+app.use('/projects', projectRouter)
 
 app.get('/', (req, res) => {
      res.send("Hello Brother");

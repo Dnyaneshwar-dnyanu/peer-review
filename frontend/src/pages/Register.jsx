@@ -1,11 +1,10 @@
 import React, { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function Register() {
-
+     const navigate = useNavigate();
      const [form, setForm] = useState({ name: "", usn: "", email: "", role: "", password: "" });
-     let submitRef = useRef(null);
-     const [auth, setAuth] = useState(null);
-     const [user, setUser] = useState(null);
      const [userRole, setUserRole] = useState('student');
 
      const handleChange = (e) => {
@@ -26,17 +25,16 @@ function Register() {
           let data = await res.json();
 
           if (data.auth) {
-               setAuth(true);
-               setUser(data.user);
                if(data.user.role === 'student') {
-                    window.location.href = '/students/dashboard';
+                    navigate('/student/dashboard');
                }
                else if (data.user.role === 'admin') {
-                    window.location.href = '/admin/dashboard';
+                    navigate('/admin/dashboard');
                }
+               toast.success("Successfully Registered!");
           }
           else {
-               console.log(data);
+               toast.error(data.message);
           }
      }
 
@@ -59,6 +57,7 @@ function Register() {
                               name="name"
                               value={form.name}
                               onChange={handleChange}
+                              autoComplete='off'
                               placeholder="Full Name"
                               className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
                          />
@@ -67,6 +66,7 @@ function Register() {
                               name="role"
                               value={form.role}
                               onChange={handleChange}
+                              autoComplete='off'
                               className="w-full p-3 rounded-lg bg-white/20 border border-white/30 focus:bg-white/30 outline-none"
                          >
                               <option value="" disabled>Select your role</option>
@@ -81,6 +81,7 @@ function Register() {
                                    name="usn"
                                    value={form.usn}
                                    onChange={handleChange}
+                                   autoComplete='off'
                                    placeholder="USN"
                                    className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
                               />
@@ -91,6 +92,7 @@ function Register() {
                               name="email"
                               value={form.email}
                               onChange={handleChange}
+                              autoComplete='off'
                               placeholder="Email Address"
                               className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
                          />
@@ -100,6 +102,7 @@ function Register() {
                               name="password"
                               value={form.password}
                               onChange={handleChange}
+                              autoComplete='off'
                               placeholder="Password"
                               className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
                          />

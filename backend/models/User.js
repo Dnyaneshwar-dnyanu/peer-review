@@ -2,7 +2,10 @@ const mongoose = require('mongoose');
 
 let userSchema = mongoose.Schema({
      name: String,
+
+     // Only for students
      usn: String,
+     
      email: String,
      password: String,
 
