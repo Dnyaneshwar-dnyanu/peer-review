@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 let connectDB = async () => {
      try {
-          await mongoose.connect("mongodb://localhost:27017/peer-review");
+          await mongoose.connect(process.env.MONGO_URL);
           console.log("Mongoose Connected");
      }
      catch (err) {
