@@ -41,10 +41,10 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-500 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
       {/* Animated Login Card */}
       <div className="
-        w-full max-w-md p-10 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-xl 
+        w-full max-w-md p-10 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-2xl 
         bg-white/10 transform transition duration-500 hover:scale-[1.02] hover:shadow-xl
       ">
 
@@ -94,7 +94,7 @@ function Login() {
           {/* Login Button */}
           <button
             onClick={login}
-            className="w-full py-3 bg-white text-indigo-600 rounded-lg font-semibold 
+            className="w-full py-3 text-lg bg-white text-indigo-900 rounded-lg font-semibold 
                        hover:bg-gray-200 transition"
           >
             Login

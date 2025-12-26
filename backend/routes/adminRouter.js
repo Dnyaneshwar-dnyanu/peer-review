@@ -78,7 +78,7 @@ router.get('/openRoom/:roomID', validateUser, async (req, res) => {
      room.status = "OPEN";
      await room.save();
 
-     res.send(code);
+     res.send({ code: code });
 });
 
 router.get('/closeRoom/:roomID', validateUser, async (req, res) => {
@@ -88,7 +88,7 @@ router.get('/closeRoom/:roomID', validateUser, async (req, res) => {
      room.participants = [];
      await room.save();
 
-     res.send({ success: true, message: "Room Closed Successfully" });
+     res.send({ success: true, code: room.roomCode, message: "Room Closed Successfully" });
 });
 
 

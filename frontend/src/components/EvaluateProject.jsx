@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 function EvaluateForm({ project }) {
     const [form, setForm] = useState({ marks: 0, comment: "" });
     const [reviews, setReviews] = useState([]);
+    const [ marks, setMarks ] = useState(project.avgMarks);
 
     useEffect(() => {
         if (project) {
@@ -66,6 +67,7 @@ function EvaluateForm({ project }) {
         if (res.status === 200) {
             let data = await res.json();
             setReviews(data.reviews);
+            setMarks(data.avgMarks);
         }
     }
 
@@ -97,7 +99,7 @@ function EvaluateForm({ project }) {
                         {project.student.usn}
                     </p>
                     <p className="text-white/70 mt-1">
-                        Marks: {project.avgMarks}
+                        Marks: {marks}
                     </p>
                 </div>
             </div>
@@ -152,7 +154,7 @@ function EvaluateForm({ project }) {
                 onClick={addReview}
                 className="
                     w-full py-3
-                    bg-white text-indigo-600
+                    bg-white text-indigo-900
                     rounded-lg font-semibold
                     hover:bg-gray-200
                     transition"

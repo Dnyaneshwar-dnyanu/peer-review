@@ -98,6 +98,7 @@ function Home() {
             bg-white/10 backdrop-blur-xl
             border border-white/20
             hover:bg-white/15 transition
+            hover:scale-[1.04]
           ">
             <h3 className="text-xl font-semibold mb-2">
               For Students
@@ -114,6 +115,7 @@ function Home() {
             bg-white/10 backdrop-blur-xl
             border border-white/20
             hover:bg-white/15 transition
+            hover:scale-[1.04]
           ">
             <h3 className="text-xl font-semibold mb-2">
               For Teachers
@@ -130,6 +132,7 @@ function Home() {
             bg-white/10 backdrop-blur-xl
             border border-white/20
             hover:bg-white/15 transition
+            hover:scale-[1.04]
           ">
             <h3 className="text-xl font-semibold mb-2">
               Transparent Evaluation

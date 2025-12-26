@@ -6,6 +6,7 @@ import EvaluateProject from "../components/EvaluateProject";
 import { Link } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import { IoReloadSharp } from "react-icons/io5";
 
 function StudentRoom() {
      const roomID = useParams().roomID;
@@ -68,10 +69,13 @@ function StudentRoom() {
           getRoomData();
      }
 
-     if (loading) return <p>Loading...</p>
+     if (loading) 
+         return  <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
+                   <IoReloadSharp className="loader" />
+                 </div>
 
      return (
-          <div className="min-h-screen bg-gradient-to-br from-cyan-500 via-indigo-600 to-blue-500 p-6 relative">
+          <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black p-6 relative">
                <Link to='/student/dashboard' className="absolute flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> <IoArrowBackOutline className="text-zinc-600" /> Back to Home</Link>
                <div className="max-w-2xl mx-auto">
                     <div className="p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl mb-10">
@@ -99,7 +103,7 @@ function StudentRoom() {
                               <input type="text" name="title" onChange={handleChange} autoComplete='off' placeholder="Project title" className="w-full border outline-none p-3 rounded-lg bg-white/20 border-white/30 placeholder-white/70 focus:bg-white/30" />
                               <textarea name="description" onChange={handleChange} placeholder="tell us about your project...." className="w-full border outline-none p-3 rounded-lg bg-white/20 border-white/30 placeholder-white/70 focus:bg-white/30"></textarea>
                               <button onClick={submitProject}
-                                   className="w-full mt-6 px-6 py-3 bg-white text-indigo-600 rounded-lg font-semibold hover:bg-gray-200 transition">
+                                   className="w-full mt-6 px-6 py-3 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition">
                                    Submit Project
                               </button>
                          </div>

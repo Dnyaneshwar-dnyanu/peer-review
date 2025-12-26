@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { IoReloadSharp } from "react-icons/io5";
 
 function ProtectedRoute({ children, allowedRoles }) {
      const [userRole, setUserRole] = useState(null);
@@ -28,7 +29,10 @@ function ProtectedRoute({ children, allowedRoles }) {
           setLoading(false);
      }
 
-     if (loading) return <p>loading....</p>
+     if (loading) 
+         return  <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
+                   <IoReloadSharp className="loader" />
+                 </div>
 
      if (allowedRoles && !allowedRoles.includes(userRole) || !userRole) {
           return <Navigate to='/login' replace />;

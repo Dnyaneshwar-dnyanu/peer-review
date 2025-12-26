@@ -3,6 +3,7 @@ import { FaHome, FaTasks, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { IoReloadSharp } from "react-icons/io5";
 
 function StudentDashboard() {
   const navigate = useNavigate();
@@ -62,10 +63,13 @@ function StudentDashboard() {
     }
   }
 
-  if (loading) return <p>Loading...</p>
+  if (loading) 
+      return  <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
+                <IoReloadSharp className="loader" />
+              </div>
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-500 flex">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black flex">
       {showModal && (
         <div className="fixed z-10 inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
           <div className="bg-white/10 backdrop-blur-xl p-8 rounded-xl shadow-2xl border border-white/20 w-full max-w-md">
@@ -94,7 +98,7 @@ function StudentDashboard() {
               </button>
 
               <button onClick={enterRoom}
-                className="py-2 px-4 rounded-lg bg-white text-indigo-600 font-semibold hover:bg-gray-200"
+                className="py-2 px-4 rounded-lg bg-white text-indigo-900 font-semibold hover:bg-gray-200"
               >
                 Join Room
               </button>
@@ -126,7 +130,7 @@ function StudentDashboard() {
         <p className="text-white/80 mb-10">Here’s your dashboard overview</p>
         <button onClick={() => setShowModal(true)}
             className="
-              absolute right-10 top-10 px-5 py-3 bg-white text-indigo-600 rounded-lg font-semibold 
+              absolute right-10 top-10 px-4 py-2 text-lg bg-white text-indigo-900 rounded-lg font-semibold 
               hover:bg-gray-200 transition shadow-md
             "
           >

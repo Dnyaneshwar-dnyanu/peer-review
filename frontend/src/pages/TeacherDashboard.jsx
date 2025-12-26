@@ -4,6 +4,7 @@ import { IoMdAdd } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 import RoomCard from "../components/RoomCard";
 import { toast } from "react-toastify";
+import { IoReloadSharp } from "react-icons/io5";
 
 function TeacherDashboard() {
      const navigate = useNavigate();
@@ -43,10 +44,13 @@ function TeacherDashboard() {
           }
      }
 
-     if (loading) return <p>Loading...</p>
+     if (loading) 
+         return  <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
+                   <IoReloadSharp className="loader" />
+                 </div>
 
      return (
-          <div className='min-h-screen bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-500 flex'>
+          <div className='min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black flex'>
                {/* Sidebar */}
                <div className="w-64 p-6 bg-white/10 backdrop-blur-xl border-r border-white/20">
                     <h2 className="text-2xl font-bold text-white mb-10">Peer Review</h2>
@@ -68,7 +72,7 @@ function TeacherDashboard() {
                </div>
                {/* Main Content */}
                <div className="flex-1 p-10 text-white relative">
-                    <Link to='/admin/createRoom' className="absolute right-2 top-2 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md text-zinc-800 hover:scale-[1.03] transition">
+                    <Link to='/admin/createRoom' className="absolute right-4 top-5 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md text-zinc-800 hover:scale-[1.03] transition">
                          <IoMdAdd className="font-bold" />
                          Create Classroom
                     </Link>

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { IoArrowBackOutline } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 function CreateRoom() {
      const navigate = useNavigate();
@@ -30,7 +32,11 @@ function CreateRoom() {
      };
 
      return (
-          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-500 px-4">
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
+               <Link to='/admin/dashboard' className="absolute top-6 left-6 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> 
+                    <IoArrowBackOutline className="text-zinc-600" /> 
+                    Back to Home
+               </Link>
                <div className="
         w-full max-w-lg p-10 rounded-2xl shadow-2xl
         bg-white/10 backdrop-blur-xl border border-white/20
@@ -100,7 +106,7 @@ function CreateRoom() {
                          />
 
                          <button onClick={createRoom}
-                              className="w-full py-3 mt-2 bg-white text-indigo-600 rounded-lg
+                              className="w-full py-3 mt-2 bg-white text-indigo-900 rounded-lg
                        font-semibold hover:bg-gray-200 transition"
                          >
                               Create Room

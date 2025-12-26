@@ -40,7 +40,7 @@ function Register() {
 
 
      return (
-          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-500 px-4">
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
                <div className="bg-white/10 backdrop-blur-xl p-10 rounded-2xl shadow-2xl w-full max-w-md border border-white/20 transform transition duration-500 hover:scale-[1.02] hover:shadow-xl">
                     {/* Title */}
                     <h2 className="text-3xl font-bold text-white text-center mb-6">
@@ -109,7 +109,7 @@ function Register() {
 
                          <button
                               onClick={register}
-                              className="w-full py-3 mt-2 bg-white text-indigo-600 rounded-lg font-semibold hover:bg-gray-200 transition"
+                              className="w-full py-3 mt-2 text-lg bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition"
                          >
                               Register
                          </button>

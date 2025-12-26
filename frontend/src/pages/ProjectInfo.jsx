@@ -27,8 +27,8 @@ function ProjectInfo() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-cyan-500 via-indigo-600 to-blue-500 p-8">
-            <Link to={`/admin/room/${roomID}`} className="absolute flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> <IoArrowBackOutline className="text-zinc-600" /> Go Back </Link>
+        <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black p-8">
+            <Link to={`/admin/room/${roomID}`} className="absolute flex items-center gap-2 py-2 px-3 border border-white/10 bg-white/65 font-semibold rounded-md"> <IoArrowBackOutline className="text-zinc-600" /> Go Back </Link>
             <div className="max-w-5xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl p-8">
 
                 <div className="mb-8">

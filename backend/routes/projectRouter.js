@@ -89,7 +89,7 @@ router.post('/addReview/:projectID', validateUser, async (req, res) => {
 
 router.get('/getComments/:projectID', validateUser, async ( req, res ) => {
     let project = await projectModel.findOne({ _id: req.params.projectID }).populate('reviews');
-    res.send({ success: true, reviews: project.reviews });
+    res.send({ success: true, avgMarks: project.avgMarks, reviews: project.reviews });
 });
 
 module.exports = router;

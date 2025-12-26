@@ -26,7 +26,7 @@ function RoomCard({ Room }) {
                     </span>
                </p>
 
-                    <button onClick={() => navigate(`/admin/room/${Room._id}`)} className="mt-4 bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-200">
+                    <button onClick={() => navigate(`/admin/room/${Room._id}`)} className="mt-4 bg-white text-indigo-900 px-4 py-2 rounded-lg font-semibold hover:bg-gray-200">
                          View Classroom
                     </button>
           </div>

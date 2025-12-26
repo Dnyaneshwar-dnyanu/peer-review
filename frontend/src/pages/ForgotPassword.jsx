@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { FaUser, FaLock } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { IoArrowBackOutline } from 'react-icons/io5';
 
 function ForgotPassword() {
     const navigate = useNavigate();
@@ -38,11 +40,12 @@ function ForgotPassword() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-500 px-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
+            <Link to='/Login' className="absolute left-3 top-3 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> <IoArrowBackOutline className="text-zinc-600" /> Back to Home</Link>
             <div className="
-        w-full max-w-md p-10 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-xl 
-        bg-white/10 transform transition duration-500 hover:scale-[1.02] hover:shadow-xl
-      ">
+                w-full max-w-md p-10 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-xl 
+                bg-white/10 transform transition duration-500 hover:scale-[1.02] hover:shadow-xl
+            ">
 
                 <h2 className="text-3xl font-bold text-white text-center mb-6">
                     Welcome Back
@@ -97,7 +100,7 @@ function ForgotPassword() {
 
                     <button
                         onClick={changePassword}
-                        className="w-full py-3 bg-white text-indigo-600 rounded-lg font-semibold 
+                        className="w-full py-3 bg-white text-indigo-900 rounded-lg font-semibold 
                        hover:bg-gray-200 transition"
                     >
                         Update password

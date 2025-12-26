@@ -4,6 +4,21 @@ button {
     cursor: pointer;
 }
 
+.loader {
+  color: white;
+  font-size: 48px;
+  animation: loader 1s infinite linear forwards;
+}
+
+@keyframes loader {
+  0% {
+    rotate: 0deg;
+  }
+  100% {
+    rotate: 360deg;
+  }
+}
+
 /* ===== Custom Scrollbar (Glass Theme) ===== */
 
 /* For Webkit browsers (Chrome, Edge, Safari) */
