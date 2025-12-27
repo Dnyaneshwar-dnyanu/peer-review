@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaProjectDiagram, FaPlus, FaUsers } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import ProjectCard from "../components/projectCard";
+import ProjectCard from "../components/ProjectCard";
 import EvaluateProject from "../components/EvaluateProject";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { MdGetApp } from "react-icons/md";

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from 'react-toastify'
-import ProjectCard from "../components/projectCard";
+import ProjectCard from "../components/ProjectCard";
 import EvaluateProject from "../components/EvaluateProject";
 import { Link } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
