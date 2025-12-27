@@ -12,8 +12,8 @@
   "type": "commonjs",
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "cloudinary": "^1.21.0",
     "body-parser": "^2.2.1",
+    "cloudinary": "^1.21.0",
     "cookie": "^1.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
