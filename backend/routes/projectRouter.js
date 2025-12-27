@@ -47,7 +47,6 @@ router.get('/getProjects/:roomID', validateUser, async (req, res) => {
                     .findOne({ _id: req.params.roomID })
                     .populate('projects')
                     .populate('projects.student');
-    console.log(room);
                     
     res.send({ projects: room.projects });
 });

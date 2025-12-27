@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 function EvaluateForm({ project }) {
     const [form, setForm] = useState({ marks: 0, comment: "" });
     const [reviews, setReviews] = useState([]);
-    const [ marks, setMarks ] = useState(project.avgMarks);
+    const [marks, setMarks] = useState(project.avgMarks);
 
     useEffect(() => {
         if (project) {
@@ -77,12 +77,12 @@ function EvaluateForm({ project }) {
 
     return (
         <div className="
-        p-8 rounded-md
+        md:p-8 p-4 rounded-md
         border border-white/20
         shadow-xl text-white
         h-full">
             {/* Header */}
-            <div className="mb-6 flex justify-between">
+            <div className="mb-6 flex md:flex-row flex-col justify-between md:gap-0 gap-3">
                 <div>
                     <h2 className="text-2xl font-bold capitalize">
                         {project.title}
@@ -95,12 +95,14 @@ function EvaluateForm({ project }) {
                     <h2 className="text-2xl font-bold capitalize">
                         {project.student.name}
                     </h2>
-                    <p className="text-white/70 mt-1">
-                        {project.student.usn}
-                    </p>
-                    <p className="text-white/70 mt-1">
-                        Marks: {marks}
-                    </p>
+                    <div className="flex md:flex-col flex-row md:gap-0 gap-4">
+                        <p className="text-white/70 mt-1">
+                            {project.student.usn}
+                        </p>
+                        <p className="text-white/70 mt-1">
+                            <span className="md:hidden inline-block mr-2"> • </span>Marks: {marks}
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -164,7 +166,7 @@ function EvaluateForm({ project }) {
 
             <div
                 className="
-                    mt-4 p-5 rounded-2xl
+                    mt-4 md:p-5 p-3 rounded-2xl
                     bg-zinc-800/20 backdrop-blur-xl
                     border border-white/20
                     text-white

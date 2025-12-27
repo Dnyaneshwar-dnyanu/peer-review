@@ -61,7 +61,6 @@ router.get('/export/:roomID', validateUser, async (req, res) => {
           `attachment; filename=${room.roomName}_${room.semester}_${room.section}.csv`
      )
 
-     console.log("File was downloaded")
      res.status(200).send(csv)
      }
      catch (err) {

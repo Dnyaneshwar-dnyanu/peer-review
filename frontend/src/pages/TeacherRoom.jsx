@@ -78,7 +78,7 @@ function ClassroomPage() {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black p-6 relative">
-        <Link to='/admin/dashboard' className="absolute flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> <IoArrowBackOutline className="text-zinc-600" /> Back to Home</Link>
+        <Link to='/admin/dashboard' className="md:absolute relative md:mb-0 mb-3 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> <IoArrowBackOutline className="text-zinc-600" /> Back to Home</Link>
         <div className="max-w-5xl mx-auto">
 
           {/* Room Header */}
@@ -127,7 +127,7 @@ function ClassroomPage() {
           </div>
 
           {/* Dashboard Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-7">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-7">
 
             {/* Students Count */}
             <div className="
@@ -181,7 +181,7 @@ function ClassroomPage() {
                 href={`http://localhost:3000/admin/export/${roomId}`}
                 className="
                     inline-flex items-center gap-2
-                    px-5 py-3 rounded-lg
+                    md:px-5 md:py-3 p-2 rounded-lg
                     bg-indigo-500/20 text-indigo-300
                     border border-indigo-400/30
                     font-semibold
@@ -196,8 +196,8 @@ function ClassroomPage() {
             </div>
           </div>
         </div>
-        <div className="max-h-[90vh] w-full flex justify-between gap-4 p-3 px-5 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl">
-          <div className="w-[40%]">
+        <div className="md:max-h-[90vh] w-full flex md:flex-row flex-col justify-between gap-4 p-3 px-5 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl">
+          <div className="md:w-[40%]">
             <div className="header flex justify-around">
               <h2
                 className={`text-2xl text-white font-bold mb-4 cursor-pointer ${showProjects ? "text-white/35 hover:text-white/60" : "text-white"}`}
@@ -212,7 +212,7 @@ function ClassroomPage() {
             </div>
             {
               !showProjects ?
-                <div id="participants" className="max-h-[94%] overflow-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6">
+                <div id="participants" className="max-h-[94%] overflow-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl md:p-6 p-4">
                   {room && room.participants.length === 0 ? (
                     <p className="text-white/70">No students joined yet.</p>
                   ) : (
@@ -241,8 +241,8 @@ function ClassroomPage() {
                 </div>
             }
           </div>
-          <div className="px-[1px] bg-white/30"></div>
-          <div className="w-[60%]">
+          <div className="md:px-[1px] py-[1px] bg-white/30"></div>
+          <div id="review" className="md:w-[60%]">
             <h2 className="text-2xl text-white text-center font-bold mb-4">Evaluate the project</h2>
             <div className="bg-[#3c3c3c] rounded-md max-h-[94%] overflow-auto">
               {

@@ -11,8 +11,6 @@ router.get('/room/:roomCode', validateUser, async (req, res) => {
           let isInsideRoom = room.participants.find(
                item => item.toString() === req.user._id.toString()
           )
-          console.log(isInsideRoom);
-          
           if (!isInsideRoom) {
                room.participants.push(req.user._id);
                await room.save();

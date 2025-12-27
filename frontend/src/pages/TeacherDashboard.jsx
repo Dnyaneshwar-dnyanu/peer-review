@@ -5,12 +5,14 @@ import { Link, useNavigate } from "react-router-dom";
 import RoomCard from "../components/RoomCard";
 import { toast } from "react-toastify";
 import { IoReloadSharp } from "react-icons/io5";
+import { IoMdMenu, IoMdClose } from "react-icons/io";
 
 function TeacherDashboard() {
      const navigate = useNavigate();
      const logoutBtn = useRef(null);
      const [user, setUser] = useState(null);
      const [loading, setLoading] = useState(true);
+     const [showMenu, setShowMenu] = useState(false);
 
      useEffect(() => {
           getUser();
@@ -44,61 +46,77 @@ function TeacherDashboard() {
           }
      }
 
-     if (loading) 
-         return  <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
-                   <IoReloadSharp className="loader" />
-                 </div>
+     if (loading)
+          return <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
+               <IoReloadSharp className="loader" />
+          </div>
 
      return (
           <div className='min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black flex'>
                {/* Sidebar */}
-               <div className="w-64 p-6 bg-white/10 backdrop-blur-xl border-r border-white/20">
-                    <h2 className="text-2xl font-bold text-white mb-10">Peer Review</h2>
+               <div className={`${showMenu ? "showMenu z-10" : "sidebar"} w-64 p-6 bg-white/10 backdrop-blur-xl border-r border-white/20`}>
+                    <h1 className="text-3xl font-bold tracking-wide text-white mb-20">
+                         Peer<span className="text-indigo-400">Review</span>
+                    </h1>
 
                     <ul className="flex flex-col gap-6 text-white text-lg">
-                         <li className="flex items-center gap-3 hover:text-gray-200 cursor-pointer">
-                              <FaHome /> Home
+                         <li>
+                              <Link className="flex items-center gap-3 hover:text-gray-200 cursor-pointer"
+                                   onClick={() => setShowMenu(false)}
+                                   to='/admin/dashboard'>
+                                   <FaHome /> Home
+                              </Link>
                          </li>
-                         <li className="flex items-center gap-3 hover:text-gray-200 cursor-pointer">
-                              <FaTasks /> Class Rooms
-                         </li>
-                         <li className="flex items-center gap-3 hover:text-gray-200 cursor-pointer">
-                              <FaUserGraduate /> Profile
-                         </li>
-                         <li ref={logoutBtn} onClick={logout} className="flex items-center gap-3 mt-10 text-red-200 hover:text-red-100 cursor-pointer">
-                              <FaSignOutAlt /> Logout
+                         <li>
+                              <a className="flex items-center gap-3 hover:text-gray-200 cursor-pointer"
+                                   onClick={() => setShowMenu(false)}
+                                   href='#classRoom'>
+                                   <FaTasks /> Classrooms
+                              </a>
                          </li>
                     </ul>
+                    <span onClick={() => { setShowMenu(false) }} className="closeBar absolute top-3 right-2">
+                         <IoMdClose className="text-white text-3xl" />
+                    </span>
+                    <div ref={logoutBtn} onClick={logout} className="absolute left-8 bottom-8 flex items-center gap-3 text-xl text-red-200 hover:text-red-100 cursor-pointer">
+                         <FaSignOutAlt /> Logout
+                    </div>
                </div>
                {/* Main Content */}
                <div className="flex-1 p-10 text-white relative">
-                    <Link to='/admin/createRoom' className="absolute right-4 top-5 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md text-zinc-800 hover:scale-[1.03] transition">
-                         <IoMdAdd className="font-bold" />
-                         Create Classroom
-                    </Link>
+
+                    <IoMdMenu onClick={() => { setShowMenu(true) }} className="menuBar text-3xl " />
 
                     {/* Greeting Section */}
                     <h1 className="text-4xl font-bold mb-2">Welcome back, {user && user.name.split(' ')[0]}!</h1>
                     <p className="text-white/80 mb-10">Here’s your dashboard overview</p>
 
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-10">
 
-                         {/* Card 1 */}
                          <div className="
-                              p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
+                              p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
                               hover:scale-[1.03] transition transform shadow-lg
                          ">
                               <h3 className="text-xl font-semibold">Total Class Rooms</h3>
                               <p className="text-4xl font-bold mt-4">{user && user.roomsCreated.length}</p>
                          </div>
 
+                         <div className="
+                              p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
+                              hover:scale-[1.03] transition transform shadow-lg cursor-pointer
+                         ">
+                              <Link to='/admin/createRoom'>
+                                   <h3 className="text-xl font-semibold">Create Classroom</h3>
+                                   <IoMdAdd className="text-4xl font-bold mt-4" />
+                              </Link>
+                         </div>
                     </div>
 
                     {/* Class Room Section */}
                     <h2 className="text-2xl font-semibold mb-4">Your Class Rooms</h2>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div id="classRoom" className="grid grid-cols-1 md:grid-cols-3 gap-4">
                          {
                               user && user.roomsCreated.map((room) =>
                                    <RoomCard key={room._id} Room={room} />

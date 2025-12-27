@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 button {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .loader {
@@ -10,12 +10,49 @@ button {
   animation: loader 1s infinite linear forwards;
 }
 
+
 @keyframes loader {
   0% {
     rotate: 0deg;
   }
+
   100% {
     rotate: 360deg;
+  }
+}
+
+.menuBar,
+.closeBar {
+  display: none;
+  cursor: pointer;
+}
+
+
+@media (max-width: 600px) {
+  .sidebar, .showMenu {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: all 0.5s ease;
+  }
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .showMenu {
+    transform: translate(0);
+  }
+
+  .menuBar {
+    position: relative;
+    top: -20px;
+    left: -20px;
+    display: block;
+    color: white;
+  }
+
+  .closeBar {
+    display: block;
   }
 }
 
