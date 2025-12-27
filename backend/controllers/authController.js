@@ -18,7 +18,12 @@ module.exports.registerUser = async (req, res) => {
 
                     user.password = undefined;
                     let token = generateToken(user);
-                    res.cookie('token', token);
+                    res.cookie("token", token, {
+                         httpOnly: true,
+                         secure: true,
+                         sameSite: "none",
+                         maxAge: 24 * 60 * 60 * 1000
+                    });
 
                     return res.send({ auth: true, user: user });
                });
@@ -26,7 +31,7 @@ module.exports.registerUser = async (req, res) => {
           return;
      }
 
-     return res.send({ auth: false, message: "This email already registered!"});
+     return res.send({ auth: false, message: "This email already registered!" });
 }
 
 module.exports.loginUser = async (req, res) => {
@@ -38,7 +43,12 @@ module.exports.loginUser = async (req, res) => {
                if (result) {
                     user.password = undefined;
                     let token = generateToken(user);
-                    res.cookie('token', token);
+                    res.cookie("token", token, {
+                         httpOnly: true,
+                         secure: true,
+                         sameSite: "none",
+                         maxAge: 24 * 60 * 60 * 1000
+                    });
                     return res.send({ auth: true, user: user });
                }
                return res.send({ auth: false, message: "Invalid password" });
