@@ -1,9 +1,14 @@
-# 📘 Peer Review System
+<div align="center">
+            <img width="400" height="400" alt="fd4656d0-fab6-4c3c-a958-aed5f8833169" src="https://github.com/user-attachments/assets/01c05d14-2454-4d40-952d-27412cfb5095" />
+            <br>
+            A full-stack web application designed to streamline the <b>academic peer review process</b> in colleges.
+            <br>
+            The platform enables  <b>teachers to create classrooms</b> ,  <b>students to submit projects</b> , and <b>teachers to evaluate projects</b> with structured feedback and marks.
+</div>
 
-A full-stack web application designed to streamline the **academic peer review process** in colleges.
-The platform enables  **teachers to create classrooms** ,  **students to submit projects** , and **teachers to evaluate projects** with structured feedback and marks.
-
----
+## 🚀 Live Demo
+- 🌐 Frontend: [https://peer-review-system.vercel.app](https://student-peer-review-nu.vercel.app/)
+- 🔗 Backend: [https://peer-review-backend.onrender.com](https://peer-review-yyx3.onrender.com)
 
 ## 🚀 Features
 
