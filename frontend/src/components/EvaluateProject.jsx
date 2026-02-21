@@ -1,14 +1,16 @@
 import { toast } from "react-toastify";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-function EvaluateForm({ project }) {
+function EvaluateForm({ project, maxMarks }) {
     const [form, setForm] = useState({ marks: 0, comment: "" });
     const [reviews, setReviews] = useState([]);
     const [marks, setMarks] = useState(project.avgMarks);
+    const [viewType, setViewType] = useState(false);
 
     useEffect(() => {
         if (project) {
             getComments();
+            isItUsersProject();
         }
 
         let interval = setInterval(() => {
@@ -23,12 +25,12 @@ function EvaluateForm({ project }) {
     if (!project) {
         return (
             <div className="
-        h-full flex items-center justify-center
-        text-white/70 text-lg
-        bg-white/10
-        border border-white/20 rounded-md
-        p-6
-      ">
+                h-full flex items-center justify-center
+                text-white/70 text-lg
+                bg-white/10
+                border border-white/20 rounded-md
+                p-6
+            ">
                 Select a project to give the review ✨
             </div>
         );
@@ -51,11 +53,11 @@ function EvaluateForm({ project }) {
                 toast.error(data.message);
             }
             getComments();
-            setForm({ marks: 0, comment: "" });
-        }
-        else {
+            
+        } else {
             toast.error("Error in adding review")
         }
+        setForm({ marks: 0, comment: "" });
     }
 
     const getComments = async () => {
@@ -75,6 +77,19 @@ function EvaluateForm({ project }) {
         setForm({ ...form, [e.target.name]: e.target.value });
     }
 
+    const isItUsersProject = async () => {
+        const res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/student/${project._id}/isUserProject`, {
+            method: "GET",
+            credentials: "include"
+        });
+
+        if (res.status === 200) {
+            const data = await res.json();
+            setViewType(data.status ? "viewReview" : "addReview");
+        }
+    }
+
+
     return (
         <div className="
         md:p-8 p-4 rounded-md
@@ -82,7 +97,7 @@ function EvaluateForm({ project }) {
         shadow-xl text-white
         h-full">
             {/* Header */}
-            <div className="mb-6 flex md:flex-row flex-col justify-between md:gap-0 gap-3">
+            <div className="mb-8 flex md:flex-row flex-col justify-between items-start md:items-center gap-4 border-b border-white/10 pb-6">
                 <div>
                     <h2 className="text-2xl font-bold capitalize">
                         {project.title}
@@ -106,41 +121,46 @@ function EvaluateForm({ project }) {
                 </div>
             </div>
 
-            {/* Marks Input */}
-            <div className="mb-4">
-                <label className="block text-white/80 mb-1">
-                    Marks
-                </label>
-                <input
-                    type="number"
-                    name="marks"
-                    placeholder="Enter marks"
-                    min={0}
-                    max={10}
-                    value={form.marks}
-                    onChange={handleChange}
-                    className="
-            w-full p-3 rounded-lg
-            bg-white/20 text-white
-            placeholder-white/60
-            border border-white/30
-            focus:bg-white/30 outline-none
-          "
-                />
-            </div>
+            {viewType === "addReview" &&
+                <div className="mb-8 p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg">
 
-            {/* Feedback */}
-            <div className="mb-6">
-                <label className="block text-white/80 mb-1">
-                    Feedback
-                </label>
-                <textarea
-                    name="comment"
-                    rows="4"
-                    placeholder="Write feedback about the project"
-                    onChange={handleChange}
-                    value={form.comment}
-                    className="
+                    {/* Marks Input */}
+                    <div className="mb-4">
+                        <label className="block text-white/80 mb-1">
+                            Marks
+                        </label>
+                        <input
+                            type="number"
+                            name="marks"
+                            placeholder="Enter marks"
+                            min={0}
+                            max={maxMarks}
+                            value={form.marks}
+                            onChange={handleChange}
+                            className="
+                                w-full p-3 rounded-xl
+                                bg-white/10 text-white
+                                placeholder-white/50
+                                border border-white/20
+                                focus:bg-white/20
+                                focus:border-indigo-400
+                                transition outline-none
+                                "
+                        />
+                    </div>
+
+                    {/* Feedback */}
+                    <div className="mb-6">
+                        <label className="block text-white/80 mb-1">
+                            Feedback
+                        </label>
+                        <textarea
+                            name="comment"
+                            rows="4"
+                            placeholder="Write feedback about the project"
+                            onChange={handleChange}
+                            value={form.comment}
+                            className="
                         w-full p-3 rounded-lg
                         bg-white/20 text-white
                         placeholder-white/60
@@ -148,30 +168,34 @@ function EvaluateForm({ project }) {
                         focus:bg-white/30 outline-none
                         resize-none
                     "
-                />
-            </div>
+                        />
+                    </div>
 
-            {/* Submit Button */}
-            <button
-                onClick={addReview}
-                className="
-                    w-full py-3
-                    bg-white text-indigo-900
-                    rounded-lg font-semibold
-                    hover:bg-gray-200
-                    transition"
-            >
-                Submit Feedback
-            </button>
+                    {/* Submit Button */}
+                    <button
+                        onClick={addReview}
+                        className="
+                            w-full py-3
+                            bg-indigo-500 hover:bg-indigo-600
+                            rounded-xl font-semibold
+                            shadow-md
+                            transition-all duration-200
+                            hover:scale-[1.02]
+                            "
+                    >
+                        Submit Feedback
+                    </button>
+                </div>
+            }
 
-            <div
-                className="
-                    mt-4 md:p-5 p-3 rounded-2xl
-                    bg-zinc-800/20 backdrop-blur-xl
-                    border border-white/20
-                    text-white
-                "
-            >
+
+            <div className="
+                mt-6 p-6 rounded-2xl
+                bg-white/5 backdrop-blur-lg
+                border border-white/10
+                shadow-inner
+            ">
+
                 <h3 className="text-xl font-semibold mb-4">Feedback</h3>
                 {reviews.length === 0 ? (
                     <p className="text-white/70 italic">

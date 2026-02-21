@@ -1,56 +1,150 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
+import EditProject from "../components/EditProject";
+import ConfirmModal from "../components/ConfirmModel";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 function ProjectInfo() {
+    const navigate = useNavigate();
     const projectID = useParams().projectID;
     const roomID = useParams().roomID;
     const [project, setProject] = useState({});
 
+    const [edit, setEdit] = useState(false);
+    const [deleteProject, setDeleteProject] = useState(false);
+
     useEffect(() => {
         getProjectInfo();
-
-        let interval = setInterval(getProjectInfo, 5000);
-
-        return () => clearInterval(interval);
-    }, []);
+    }, [projectID]);
 
     const getProjectInfo = async () => {
-        const res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/getInfo/${projectID}`, {
-            credentials: "include",
-        })
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${projectID}/getInfo`, 
+                { withCredentials: true }
+            );
+    
+            if (!res.status || !res.data.project) {
+                navigate(`/admin/room/${roomID}`);
+            } 
+                
+            setProject(res.data.project);
 
-        if (res.status === 200) {
-            let data = await res.json();
-            setProject(data.project);
+        } catch (err) {
+            toast.error("Failed to fetch project details")
+            navigate(`/admin/room/${roomID}`);
+        }
+    };
+
+    const handleEdit = async (updatedData) => {
+        if (!project?._id) return;
+
+        try {
+            const res = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${project._id}/update`, 
+                updatedData, 
+                { withCredentials: true }
+            );
+
+            if (res.data.success) {
+                getProjectInfo();
+                setEdit(false);
+            }
+
+            toast.success(res.data.message);
+        }
+        catch (err) {
+            toast.error("Failed to edit");
+        }
+    }
+
+    const handleDelete = async () => {
+        if (!project?._id) return;
+
+        try {
+            const res = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${project._id}/delete`, 
+                { withCredentials: true }
+            );
+
+            setDeleteProject(false);
+
+            if (res.data.success) {
+                toast.success(res.data.message);
+                getProjectInfo();
+
+            } else {
+                toast.error(res.data.message);
+            }
+
+        } catch (err) {
+            toast.error("Failed to Delete");
+            setDeleteProject(false);
         }
     }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black md:p-8 p-6">
-            <Link to={`/admin/room/${roomID}`} className="md:absolute relative md:mb-0 mb-3 flex items-center gap-2 py-2 px-3 border border-white/10 bg-white/65 font-semibold rounded-md"> <IoArrowBackOutline className="text-zinc-600" /> Go Back </Link>
-            <div className="max-w-5xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl p-8">
+
+            <Link to={`/admin/room/${roomID}`} className="md:absolute relative md:mb-0 mb-3 flex items-center gap-2 py-2 px-3 border border-white/10 bg-white/65 font-semibold rounded-md"> 
+                <IoArrowBackOutline className="text-zinc-600" /> Go Back 
+            </Link>
+
+            <div className="max-w-5xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl p-8 relative">
+                <div className="absolute top-5 right-5 flex justify-end gap-3 mb-6">
+                    <button
+                        onClick={() => setEdit(true)}
+                        className="
+                            px-3 py-2 rounded-lg
+                            bg-indigo-500/20 text-indigo-200
+                            border border-indigo-400/30
+                            hover:bg-indigo-500/30
+                            hover:scale-[1.03]
+                            transition-all duration-200
+                            font-semibold
+                            backdrop-blur-md
+                            "
+                    >
+                        ✏️ Edit
+                    </button>
+
+                    <button
+                        onClick={() => setDeleteProject(true) }
+                        className="
+                            px-3 py-2 rounded-lg
+                            bg-red-500/20 text-red-200
+                            border border-red-400/30
+                            hover:bg-red-500/30
+                            hover:scale-[1.03]
+                            transition-all duration-200
+                            font-semibold
+                            backdrop-blur-md
+                            "
+                    >
+                        🗑 Delete
+                    </button>
+                </div>
 
                 <div className="mb-8">
                     <h2 className="text-4xl font-bold text-white mb-3">
-                        {project.title}
+                        {project?.title}
                     </h2>
 
                     <p className="text-white/80 leading-relaxed max-w-3xl">
-                        {project.description}
+                        {project?.description}
                     </p>
 
                     <div className="flex flex-wrap gap-3 mt-5 text-sm">
                         <span className="px-4 py-1.5 rounded-full bg-indigo-500/20 text-indigo-200 border border-indigo-400/30">
-                            👤 {project.student?.name}
+                            👤 {project?.student?.name}
                         </span>
 
                         <span className="px-4 py-1.5 rounded-full bg-cyan-500/20 text-cyan-200 border border-cyan-400/30">
-                            USN: {project.student?.usn}
+                            USN: {project?.student?.usn}
                         </span>
 
                         <span className="px-4 py-1.5 rounded-full bg-white/10 text-white/70 border border-white/20">
-                            📅 {new Date(project.submittedAt).toLocaleDateString()}
+                            📅 {new Date(project?.submittedAt).toLocaleDateString()}
                         </span>
                     </div>
                 </div>
@@ -62,7 +156,7 @@ function ProjectInfo() {
                         Review Summary
                     </h3>
 
-                    {project.reviews && project.reviews.length > 0 ? (
+                    {project?.reviews && project?.reviews.length > 0 ? (
                         <div className="space-y-6">
 
                             <div className="flex items-center justify-between md:p-6 p-4 rounded-xl bg-green-500/10 border border-green-400/30">
@@ -111,6 +205,26 @@ function ProjectInfo() {
                     )}
                 </div>
             </div>
+
+            {
+                edit &&
+                <EditProject
+                    project={project}
+                    onSave={async (updatedData) => {
+                        handleEdit(updatedData)
+                    }} />
+            }
+
+            {
+                deleteProject && 
+                <ConfirmModal 
+                    isOpen={deleteProject} 
+                    title = "Delete Project"
+                    message = "Are you sure you want to delete this project? This action cannot be undone."
+                    onConfirm={() => handleDelete()}
+                    onCancel={ () => setDeleteProject(false)}
+                />
+            }
         </div>
 
     );

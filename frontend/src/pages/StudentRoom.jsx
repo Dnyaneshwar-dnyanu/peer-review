@@ -32,7 +32,7 @@ function StudentRoom() {
 
           if (res.status === 200) {
                let data = await res.json()
-               
+
                if (data.room.status === 'CLOSED') {
                     navigate('/student/dashboard');
                     return;
@@ -62,17 +62,17 @@ function StudentRoom() {
           });
 
           if (res.status === 200) {
-               toast.success('Project added successfully!');
                setForm({ title: "", description: "" });
+               toast.success('Project added successfully!');
           }
 
           getRoomData();
      }
 
-     if (loading) 
-         return  <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
-                   <IoReloadSharp className="loader" />
-                 </div>
+     if (loading)
+          return <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
+               <IoReloadSharp className="loader" />
+          </div>
 
      return (
           <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black p-6 relative">
@@ -100,8 +100,8 @@ function StudentRoom() {
                          <h2 className="text-2xl text-white font-bold mb-6">Submit Your Project</h2>
 
                          <div className="flex flex-col items-center gap-2 md:px-15 text-white/80">
-                              <input type="text" name="title" onChange={handleChange} autoComplete='off' placeholder="Project title" className="w-full border outline-none p-3 rounded-lg bg-white/20 border-white/30 placeholder-white/70 focus:bg-white/30" />
-                              <textarea name="description" onChange={handleChange} placeholder="tell us about your project...." className="w-full border outline-none p-3 rounded-lg bg-white/20 border-white/30 placeholder-white/70 focus:bg-white/30"></textarea>
+                              <input type="text" name="title" value={form.title} onChange={handleChange} autoComplete='off' placeholder="Project title" className="w-full border outline-none p-3 rounded-lg bg-white/20 border-white/30 placeholder-white/70 focus:bg-white/30" />
+                              <textarea name="description" value={form.description} onChange={handleChange} placeholder="tell us about your project...." className="w-full border outline-none p-3 rounded-lg bg-white/20 border-white/30 placeholder-white/70 focus:bg-white/30"></textarea>
                               <button onClick={submitProject}
                                    className="w-full mt-6 px-6 py-3 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition">
                                    Submit Project
@@ -119,7 +119,7 @@ function StudentRoom() {
                                    <p className="text-white/70">Anyone haven't submitted any project yet.</p>
                                    :
                                    projects.map(project => {
-                                        return <ProjectCard key={project._id} project={project} isAdmin={false} isActive={selectedProject?._id === project._id} onSelectProject={setSelectedProject} />
+                                        return <ProjectCard key={project._id} project={project} isAdmin={false} isActive={selectedProject?._id === project._id} onSelectProject={setSelectedProject}  />
                                    })
                               }
                          </div>

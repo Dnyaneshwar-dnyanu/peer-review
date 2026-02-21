@@ -14,6 +14,15 @@ function CreateRoom() {
      });
 
      const createRoom = async () => {
+          if (form.roomName.trim().length < 4 || 
+               form.semester.trim().length === 0 || 
+               form.section.trim().length === 0 || 
+               parseInt(form.maxMarks.trim()) < 0 ||
+               parseInt(form.maxMarks.trim()) > 100 
+          ) {
+               return toast.error("Enter valid details");
+          }
+          
           const res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/createRoom`, {
                method: 'POST',
                credentials: "include",

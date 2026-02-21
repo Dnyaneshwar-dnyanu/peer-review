@@ -113,13 +113,23 @@ function TeacherDashboard() {
                          </div>
                     </div>
 
-                    {/* Class Room Section */}
-                    <h2 className="text-2xl font-semibold mb-4">Your Class Rooms</h2>
+                    <div className="border border-zinc-700"></div>
 
-                    <div id="classRoom" className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Class Room Section */}
+                    <h2 id="classRoom" className="text-2xl font-semibold my-4">Your Classrooms</h2>
+
+                    <div className="p-4">
                          {
-                              user && user.roomsCreated.map((room) =>
-                                   <RoomCard key={room._id} Room={room} />
+                              user.roomsCreated.length > 0 ? (
+                                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        {
+                                             user.roomsCreated.map((room) =>
+                                                  <RoomCard key={room._id} Room={room} onUpdate={() => getUser()} />
+                                             )
+                                        }
+                                   </div>
+                              ) : (
+                                   <p className="text-zinc-500">You haven't created any classrooms</p>
                               )
                          }
                     </div>

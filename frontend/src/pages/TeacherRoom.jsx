@@ -249,7 +249,7 @@ function ClassroomPage() {
                 !selectedProject ?
                   <p className="text-white/70 p-4">Select the project to evaluate</p>
                   :
-                  <EvaluateProject project={selectedProject} />
+                  <EvaluateProject project={selectedProject} maxMarks={room.maxMarks} />
               }
             </div>
           </div>

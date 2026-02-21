@@ -1,11 +1,30 @@
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 
 function ProjectCard({ project, isAdmin, roomID, isActive, onSelectProject }) {
   const navigate = useNavigate();
+
+  const [viewType, setViewType] = useState(null);
+
+  useEffect(() => {
+    isItUsersProject();
+  }, [project._id]);
+
+  const isItUsersProject = async () => {
+    const res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/student/${project._id}/isUserProject`, {
+      method: "GET",
+      credentials: "include"
+    });
+
+    if (res.status === 200) {
+      const data = await res.json();
+      setViewType(data.status ? "viewReview" : "addReview");
+    }
+  }
+
   return (
     <div
-      onClick={() => onSelectProject(project)}
       className={`
         p-4 rounded-xl cursor-pointer transition
         border backdrop-blur-2xl hover:border-white hover:shadow-lg
@@ -19,7 +38,7 @@ function ProjectCard({ project, isAdmin, roomID, isActive, onSelectProject }) {
         {project.title}
       </h3>
       <p className="text-white/80">
-          {project.description}
+        {project.description}
       </p>
 
       {/* Student Info */}
@@ -33,13 +52,21 @@ function ProjectCard({ project, isAdmin, roomID, isActive, onSelectProject }) {
         <p className="text-white/60 text-xs self-start">
           Submitted on {new Date(project.submittedAt).toLocaleDateString()}
         </p>
-       
+
         <div className="md:absolute right-3 bottom-4 flex gap-2 self-end mt-2">
           {
             isAdmin &&
             <Link to={`/admin/room/${roomID}/project/${project._id}`} className=" px-2 py-1 text-sm bg-white text-indigo-900 font-semibold rounded-md hover:bg-gray-200 transition">View Info</Link>
           }
-          <button onClick={() => onSelectProject(project)} className="px-2 py-1 text-sm bg-white text-indigo-900 font-semibold rounded-md hover:bg-gray-200 transition"><HashLink to="#review" smooth>Add Review</HashLink></button>
+          <button onClick={(e) => {
+            e.stopPropagation();
+            onSelectProject(project);
+          }} 
+          className="px-2 py-1 text-sm bg-white text-indigo-900 font-semibold rounded-md hover:bg-gray-200 transition">
+            <HashLink to="#review" smooth>
+              {viewType === "viewReview" ? "View Review" : "addReview"}
+            </HashLink>
+          </button>
         </div>
       </div>
     </div>

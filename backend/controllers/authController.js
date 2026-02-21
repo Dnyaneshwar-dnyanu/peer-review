@@ -5,7 +5,13 @@ const userModel = require('../models/User');
 const roomModel = require('../models/Room');
 
 module.exports.registerUser = async (req, res) => {
-     let user = await userModel.findOne({ email: req.body.email });
+     let user;
+     if (req.body.role === "student") {
+          user = await userModel.findOne({ usn: req.body.usn });
+     }
+     else {
+          user = await userModel.findOne({ email: req.body.email });
+     }
 
      if (!user) {
           let { name, usn, email, role, password } = req.body;
@@ -31,7 +37,7 @@ module.exports.registerUser = async (req, res) => {
           return;
      }
 
-     return res.send({ auth: false, message: "This email already registered!" });
+     return res.send({ auth: false, message: "This user already registered!" });
 }
 
 module.exports.loginUser = async (req, res) => {
