@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { IoReloadSharp } from "react-icons/io5";
+import { toast } from "react-toastify";
 import Loader from "./Loader";
 
 function ProtectedRoute({ children, allowedRoles }) {

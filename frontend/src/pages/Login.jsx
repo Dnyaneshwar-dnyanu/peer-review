@@ -58,9 +58,6 @@ function Login() {
     }
   };
 
-  if (loading)
-    return <Loader />
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
       {/* Animated Login Card */}
@@ -115,10 +112,11 @@ function Login() {
           {/* Login Button */}
           <button
             onClick={login}
-            className="w-full py-3 text-lg bg-white text-indigo-900 rounded-lg font-semibold 
-                       hover:bg-gray-200 transition"
+            disabled={loading}
+            className={`w-full py-3 text-lg bg-white text-indigo-900 rounded-lg font-semibold 
+                       hover:bg-gray-200 transition ${loading && "cursor-disabled"}`}
           >
-            Login
+            {loading ? "Logging..." : "Login"}
           </button>
         </div>
 

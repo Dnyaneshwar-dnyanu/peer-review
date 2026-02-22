@@ -39,10 +39,10 @@ function ProjectCard({ project, isAdmin, roomID, isActive, onSelectProject }) {
       `}
     >
       {/* Project Title */}
-      <h3 className="text-white font-semibold text-lg">
+      <h3 className="text-white font-semibold text-lg capitalize">
         {project.title}
       </h3>
-      <p className="text-white/80">
+      <p className="text-white/80 pl-1">
         {project.description}
       </p>
 

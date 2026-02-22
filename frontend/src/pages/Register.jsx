@@ -70,9 +70,6 @@ function Register() {
           }
      }
 
-     if (loading)
-          return <Loader />
-
      return (
           <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
                <div className="bg-white/10 backdrop-blur-xl p-10 rounded-2xl shadow-2xl w-full max-w-md border border-white/20 transform transition duration-500 hover:scale-[1.02] hover:shadow-xl">
@@ -142,12 +139,11 @@ function Register() {
                          />
 
                          <button
-                              onClick={() => {
-                                   register();
-                              }}
-                              className="w-full py-3 mt-2 text-lg bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition"
+                              onClick={register}
+                              disabled={loading}
+                              className={`w-full py-3 mt-2 text-lg bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition ${loading && "cursor-disabled"}`}
                          >
-                              Register
+                              { loading ? "Registering..." : "Register"}
                          </button>
 
                     </div>

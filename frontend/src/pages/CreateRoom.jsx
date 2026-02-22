@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import Loader from "../components/Loader";
 
 function CreateRoom() {
      const navigate = useNavigate();
@@ -27,6 +26,7 @@ function CreateRoom() {
           }
 
           try {
+               setLoading(true)
                const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/createRoom`,
                     form, { withCredentials: true }
                );
@@ -40,16 +40,14 @@ function CreateRoom() {
                console.error(err);
                toast.error("Something error occurred!");
 
-          } 
+          } finally {
+               setLoading(false);
+          }
      }
 
      const handleChange = (e) => {
           setForm({ ...form, [e.target.name]: e.target.value });
      };
-
-
-     if (loading)
-          return <Loader />
 
      return (
           <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
@@ -124,11 +122,12 @@ function CreateRoom() {
                        border border-white/30 focus:bg-white/30 outline-none"
                          />
 
-                         <button onClick={createRoom}
-                              className="w-full py-3 mt-2 bg-white text-indigo-900 rounded-lg
-                       font-semibold hover:bg-gray-200 transition"
+                         <button 
+                              onClick={createRoom}
+                              disabled={loading}
+                              className={`w-full py-3 mt-2 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition ${loading && "cursor-disabled"}`}
                          >
-                              Create Room
+                              { loading ?  "Creating Classroom...": "Create Classroom" }
                          </button>
 
                     </div>

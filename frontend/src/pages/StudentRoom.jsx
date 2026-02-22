@@ -7,7 +7,6 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { IoReloadSharp } from "react-icons/io5";
 import Loader from "../components/Loader";
 
 function StudentRoom() {
@@ -15,6 +14,7 @@ function StudentRoom() {
      const navigate = useNavigate();
      const [room, setRoom] = useState(null);
      const [loading, setLoading] = useState(true);
+     const [disableButton, setDisableButton] = useState(false);
      const [form, setForm] = useState({ title: "", description: "" });
      const [projects, setProjects] = useState([]);
      const [selectedProject, setSelectedProject] = useState(null);
@@ -63,13 +63,11 @@ function StudentRoom() {
           }
 
           try {
-               setLoading(true);
+               setDisableButton(true);
 
                const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/add/${roomID}`,
                     form, { withCredentials: true }
                );
-
-               if (res.status !== 200) throw new Error("Failed");
 
                setForm({ title: "", description: "" });
                toast.success('Project added successfully!');
@@ -81,19 +79,40 @@ function StudentRoom() {
                toast.error("Something error occurred!");
 
           } finally {
-               setLoading(false);
+               setDisableButton(false);
           }
      }
 
-     if (loading)
+     async function exitRoom () {
+          try {
+               const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/student/${roomID}/exit`, {
+                    withCredentials: true
+               });
+
+               if (res.data.success) {
+                    toast(res.data.message);
+                    navigate('/student/dashboard');
+
+               } else {
+                    toast.error(res.data.message);
+               }
+          } catch (err) {
+               console.error(err);
+               toast.error("Something error occurred");
+          }
+     }
+
+     if (loading) 
           return <Loader />
 
      return (
           <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black p-6 relative">
-               <Link to='/student/dashboard' className="md:absolute relative md:mb-0 mb-4 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> <IoArrowBackOutline className="text-zinc-600" /> Back to Home</Link>
+               <Link to={"/student/dashboard"} className="md:absolute relative md:mb-0 mb-4 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> 
+                    <IoArrowBackOutline className="text-zinc-600" /> Back Home
+               </Link>
                <div className="max-w-2xl mx-auto">
                     <div className="p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl md:mb-10 mb-6">
-                         <h1 className="text-4xl font-bold text-white">{room.roomName}</h1>
+                         <h1 className="text-4xl font-bold text-white capitalize">{room.roomName}</h1>
 
                          <p className="text-white/80 mt-2">
                               Semester: <span className="font-semibold">{room.semester}</span> •
@@ -117,14 +136,15 @@ function StudentRoom() {
                               <input type="text" name="title" value={form.title} onChange={handleChange} autoComplete='off' placeholder="Project title" className="w-full border outline-none p-3 rounded-lg bg-white/20 border-white/30 placeholder-white/70 focus:bg-white/30" />
                               <textarea name="description" value={form.description} onChange={handleChange} placeholder="tell us about your project...." className="w-full border outline-none p-3 rounded-lg bg-white/20 border-white/30 placeholder-white/70 focus:bg-white/30"></textarea>
                               <button onClick={submitProject}
-                                   className="w-full mt-6 px-6 py-3 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition">
-                                   Submit Project
+                                   disabled={disableButton}
+                                   className={`w-full mt-6 px-6 py-3 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition ${disableButton && "cursor-disabled"}`}>
+                                   {disableButton ? "Submitting..." : "Submit Project"}
                               </button>
                          </div>
 
                     </div>
                </div>
-               <div className="md:max-h-[95vh] w-full flex md:flex-row flex-col justify-between gap-4 md:p-6 p-3 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl">
+               <div className="md:max-h-[90vh] w-full flex md:flex-row flex-col justify-between gap-4 p-3 px-5 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl">
                     <div className="md:w-[40%]">
                          <h2 className="text-2xl text-white text-center font-bold mb-4">Projects</h2>
 
@@ -141,12 +161,12 @@ function StudentRoom() {
                     <div className="md:px-[1px] py-[1px] bg-white/30"></div>
                     <div id="review" className="md:w-[60%]">
                          <h2 className="text-2xl text-white text-center font-bold mb-4">Evaluate the project</h2>
-                         <div className="bg-white/20 rounded-md md:max-h-[94%] overflow-auto">
+                         <div className="bg-[#3c3c3c] rounded-md max-h-[94%] overflow-auto">
                               {
                                    !selectedProject ?
                                         <p className="text-white/70 p-4">Select the project to evaluate</p>
                                         :
-                                        <EvaluateProject project={selectedProject} />
+                                        <EvaluateProject project={selectedProject} maxMarks={room.maxMarks} />
                               }
                          </div>
                     </div>

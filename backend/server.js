@@ -23,11 +23,6 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use((req, res, next) => {
-     console.log("Incoming:", req.method, req.url);
-     next();
-});
-
 app.use('/api/auth', authRouter);
 
 app.use('/admin', adminRouter);

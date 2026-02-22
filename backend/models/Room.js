@@ -9,6 +9,10 @@ const roomSchema = mongoose.Schema({
           type: mongoose.Schema.Types.ObjectId,
           ref: 'User'
      },
+     createdAt: {
+          type: Date,
+          default: Date.now
+     },
      roomCode: String,
      status: {
           type: String,

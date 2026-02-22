@@ -1,12 +1,14 @@
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useRef } from "react";
 
 function EvaluateForm({ project, maxMarks }) {
-    const [form, setForm] = useState({ marks: 0, comment: "" });
+    const [form, setForm] = useState({ marks: "", comment: "" });
     const [reviews, setReviews] = useState([]);
     const [marks, setMarks] = useState(project.avgMarks);
     const [viewType, setViewType] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (project) {
@@ -24,11 +26,10 @@ function EvaluateForm({ project, maxMarks }) {
             return toast.error("Enter Valid Marks");
 
         try {
+            setLoading(true);
             const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/addReview/${project._id}`,
                 form, { withCredentials: true }
             );
-
-            if (res.status !== 200) throw new Error("Failed");
 
             const data = res.data;
             if (data.success) {
@@ -43,6 +44,8 @@ function EvaluateForm({ project, maxMarks }) {
         } catch (err) {
             console.error(err);
             toast.error("Something error occurred!");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -140,10 +143,23 @@ function EvaluateForm({ project, maxMarks }) {
                             type="number"
                             name="marks"
                             placeholder="Enter marks"
-                            min={0}
-                            max={maxMarks}
                             value={form.marks}
-                            onChange={handleChange}
+                            onChange={(e) => {
+                                const raw = e.target.value;
+
+                                if (raw === "") {
+                                    setForm({ ...form, marks: "" });
+                                    return;
+                                }
+
+                                const numeric = Number(raw);
+
+                                if (isNaN(numeric)) return;
+
+                                const value = Math.min(maxMarks, Math.max(0, numeric));
+
+                                setForm({ ...form, marks: value });
+                            }}
                             className="
                                 w-full p-3 rounded-xl
                                 bg-white/10 text-white
@@ -181,16 +197,17 @@ function EvaluateForm({ project, maxMarks }) {
                     {/* Submit Button */}
                     <button
                         onClick={addReview}
-                        className="
+                        disabled={loading}
+                        className={`
                             w-full py-3
                             bg-indigo-500 hover:bg-indigo-600
                             rounded-xl font-semibold
                             shadow-md
                             transition-all duration-200
                             hover:scale-[1.02]
-                            "
-                    >
-                        Submit Feedback
+                            ${loading && "cursor-disabled"}
+                    `}>
+                        {loading ? "Submitting..." : "Submit Feedback"}
                     </button>
                 </div>
             }

@@ -5,6 +5,7 @@ const userModel = require('../models/User');
 const roomModel = require('../models/Room');
 const reviewModel = require('../models/Reviews');
 const { validateUser } = require('../middleware/validateUser');
+const { Mongoose } = require('mongoose');
 
 router.get('/:projectID/getInfo', validateUser, async (req, res) => {
     let project = await projectModel.findOne({ _id: req.params.projectID })
@@ -109,8 +110,14 @@ router.put('/:projectID/update', async (req, res) => {
 
 router.delete('/:projectID/delete', validateUser, async (req, res) => {
     try {
-
         let project = await projectModel.findById({ _id: req.params.projectID }).populate("reviews");
+
+        const room = await roomModel.findOne({ projects: project._id });
+
+        if (room.status === 'OPEN') {
+            return res.send({ success: false, message: "Classroom is open, you can't delete now"});
+        }
+
         let user = await userModel.findById({ _id: project.student });
 
         if (!project) {

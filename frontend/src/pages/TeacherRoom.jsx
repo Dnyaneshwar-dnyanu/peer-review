@@ -16,6 +16,7 @@ function ClassroomPage() {
   let roomId = useParams().roomID;
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [closeRoomButton, setCloseRoomButton] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [projects, setProjects] = useState([]);
   const [showProjects, setShowProjects] = useState(false);
@@ -51,7 +52,7 @@ function ClassroomPage() {
 
   let openRoom = async () => {
     try {
-      setLoading(true);
+      setCloseRoomButton(true);
 
       const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/openRoom/${roomId}`, {
         withCredentials: true
@@ -65,12 +66,15 @@ function ClassroomPage() {
     } catch (err) {
       console.error(err);
       toast.error("Something error occurred!");
+
+    } finally {
+      setCloseRoomButton(false);
     }
   }
 
   let closeRoom = async () => {
     try {
-      setLoading(true);
+      setCloseRoomButton(true);
 
       const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/closeRoom/${roomId}`, {
         withCredentials: true
@@ -85,6 +89,8 @@ function ClassroomPage() {
       console.error(err);
       toast.error("Something error occurred!");
 
+    } finally {
+      setCloseRoomButton(false);
     }
   }
 
@@ -102,7 +108,7 @@ function ClassroomPage() {
           p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
           shadow-xl mb-5
         ">
-            <h1 className="text-4xl font-bold text-white">{room && room.roomName}</h1>
+            <h1 className="text-4xl font-bold text-white capitalize">{room && room.roomName}</h1>
 
             <p className="text-white/80 mt-2">
               Semester: <span className="font-semibold">{room && room.semester}</span> •
@@ -131,12 +137,18 @@ function ClassroomPage() {
             <div className="mt-5">
               {
                 room && room.status === "OPEN" ?
-                  <button onClick={closeRoom} className="px-5 py-2 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 cursor-pointer">
-                    Close Room
+                  <button 
+                    onClick={closeRoom} 
+                    disabled={closeRoomButton}
+                    className="px-5 py-2 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 cursor-pointer">
+                    {closeRoomButton ? "Clossing Classroom..." : "Close Classroom" }
                   </button>
                   :
-                  <button onClick={openRoom} className="px-5 py-2 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 hover:scale-[1.03] cursor-pointer">
-                    Open Room
+                  <button 
+                    onClick={openRoom} 
+                    disabled={closeRoomButton}
+                    className="px-5 py-2 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 hover:scale-[1.03] cursor-pointer">
+                      {closeRoomButton ? "Opening Classroom..." : "Open Classroom" }
                   </button>
               }
             </div>

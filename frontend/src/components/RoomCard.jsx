@@ -13,17 +13,17 @@ function RoomCard({ Room, onUpdate }) {
 
      const handleDelete = async (RoomId) => {
           try {
-               const res = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/${RoomId}/delete`, 
+               const res = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/${RoomId}/delete`,
                     { withCredentials: true }
                );
-     
+
                if (res.status === 200) {
                     toast.success(res.data.message);
                }
                else {
                     toast.error(res.data.message);
                }
-     
+
                onUpdate();
                setDeleteRoom(false);
 
@@ -37,7 +37,7 @@ function RoomCard({ Room, onUpdate }) {
      return (
           <>
                <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:scale-[1.02] transition shadow-md">
-                    <h3 className="text-xl font-bold mb-2">{Room.roomName}</h3>
+                    <h3 className="text-xl font-bold mb-2 capitalize">{Room.roomName}</h3>
 
                     <p className="text-white/80 text-sm">
                          Semester: {Room.semester}
@@ -62,9 +62,15 @@ function RoomCard({ Room, onUpdate }) {
                          <MdDelete />
                     </button>
 
-                    <button onClick={() => navigate(`/admin/room/${Room._id}`)} className="mt-4 bg-white text-indigo-900 px-4 py-2 rounded-lg font-semibold hover:bg-gray-200">
-                         View Classroom
-                    </button>
+                    <div className="flex items-center justify-between relative">
+                         <button onClick={() => navigate(`/admin/room/${Room._id}`)} className="mt-4 bg-white text-indigo-900 px-3 py-1.5 rounded-lg font-semibold hover:bg-gray-200">
+                              View Classroom
+                         </button>
+
+                         <span className="text-[0.7rem] md:text-[0.8rem] text-zinc-400 absolute -bottom-4 md:-bottom-1 -right-3 md:right-0">
+                              {Room.createdAt && new Date(Room.createdAt).toLocaleDateString()}
+                         </span>
+                    </div>
                </div>
                {
                     deleteRoom &&

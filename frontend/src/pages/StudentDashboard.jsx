@@ -97,7 +97,7 @@ function StudentDashboard() {
         { withCredentials: true }
       );
 
-      if (res.status) {
+      if (res.data.success) {
         toast.success(res.data.message);
       }
       else {

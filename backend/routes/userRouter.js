@@ -16,6 +16,7 @@ router.get('/room/:roomCode/join', validateUser, async (req, res) => {
                room.participants.push(req.user._id);
                await room.save();
           }
+          
           return res.send({ success: true, message: "Joined the room", roomID: room._id });
      }
 
@@ -23,13 +24,25 @@ router.get('/room/:roomCode/join', validateUser, async (req, res) => {
 });
 
 router.get('/:projectID/isUserProject', validateUser, async (req, res) => {
-     let user = await userModel.findById(req.user._id);
+     const user = await userModel.findById(req.user._id);
 
-     let status = user.projects.some( 
+     const status = user.projects.some( 
           pId => pId.toString() == req.params.projectID
      );
 
      res.send({ status });
+});
+
+router.get('/:roomID/exit', validateUser, async (req, res) => {
+     let room = await roomModel.findById(req.params.roomID);
+
+     if (!room) 
+          return res.send({ success: false, message: "Failed to exit classroom"});
+
+     room.participants = room.participants.filter(pId => pId != req.user._id);
+     await room.save();
+
+     res.send({ success: true, message: "Exited from Classroom"});
 });
 
 module.exports = router;

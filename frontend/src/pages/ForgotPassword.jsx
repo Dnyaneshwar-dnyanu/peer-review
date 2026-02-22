@@ -53,9 +53,6 @@ function ForgotPassword() {
         }
     };
 
-    if (loading)
-        return <Loader />
-
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
             <Link to='/Login' className="absolute left-3 top-3 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> <IoArrowBackOutline className="text-zinc-600" /> Back to Home</Link>
@@ -117,10 +114,11 @@ function ForgotPassword() {
 
                     <button
                         onClick={changePassword}
-                        className="w-full py-3 bg-white text-indigo-900 rounded-lg font-semibold 
-                       hover:bg-gray-200 transition"
+                        disabled={loading}
+                        className={`w-full py-3 bg-white text-indigo-900 rounded-lg font-semibold 
+                       hover:bg-gray-200 transition ${loading && "cursor-disabled"}`}
                     >
-                        Update password
+                        { loading ? "Updating password..." :  "Update password" }
                     </button>
                 </div>
             </div>
