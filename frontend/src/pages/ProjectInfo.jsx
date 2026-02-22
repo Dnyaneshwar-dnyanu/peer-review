@@ -6,13 +6,14 @@ import ConfirmModal from "../components/ConfirmModel";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 function ProjectInfo() {
     const navigate = useNavigate();
     const projectID = useParams().projectID;
     const roomID = useParams().roomID;
     const [project, setProject] = useState({});
-
+    const [loading, setLoading] = useState(false);
     const [edit, setEdit] = useState(false);
     const [deleteProject, setDeleteProject] = useState(false);
 
@@ -22,19 +23,24 @@ function ProjectInfo() {
 
     const getProjectInfo = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${projectID}/getInfo`, 
+            setLoading(true);
+
+            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${projectID}/getInfo`,
                 { withCredentials: true }
             );
-    
-            if (!res.status || !res.data.project) {
+
+            if (res.status !== 200 || !res.data.project) {
                 navigate(`/admin/room/${roomID}`);
-            } 
-                
+            }
+
             setProject(res.data.project);
 
         } catch (err) {
             toast.error("Failed to fetch project details")
             navigate(`/admin/room/${roomID}`);
+
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -42,20 +48,25 @@ function ProjectInfo() {
         if (!project?._id) return;
 
         try {
-            const res = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${project._id}/update`, 
-                updatedData, 
+            setLoading(true);
+
+            const res = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${project._id}/update`,
+                updatedData,
                 { withCredentials: true }
             );
 
             if (res.data.success) {
                 getProjectInfo();
                 setEdit(false);
+                toast.success(res.data.message);
             }
 
-            toast.success(res.data.message);
-        }
-        catch (err) {
-            toast.error("Failed to edit");
+        } catch (err) {
+            console.error(err);
+            toast.error("Something error occurred!");
+
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -63,7 +74,7 @@ function ProjectInfo() {
         if (!project?._id) return;
 
         try {
-            const res = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${project._id}/delete`, 
+            const res = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${project._id}/delete`,
                 { withCredentials: true }
             );
 
@@ -78,16 +89,22 @@ function ProjectInfo() {
             }
 
         } catch (err) {
-            toast.error("Failed to Delete");
+            console.error(err);
+            toast.error("Something error occurred!");
+            
+        } finally {
             setDeleteProject(false);
         }
     }
 
+    if (loading)
+        return <Loader />
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black md:p-8 p-6">
 
-            <Link to={`/admin/room/${roomID}`} className="md:absolute relative md:mb-0 mb-3 flex items-center gap-2 py-2 px-3 border border-white/10 bg-white/65 font-semibold rounded-md"> 
-                <IoArrowBackOutline className="text-zinc-600" /> Go Back 
+            <Link to={`/admin/room/${roomID}`} className="md:absolute relative md:mb-0 mb-3 flex items-center gap-2 py-2 px-3 border border-white/10 bg-white/65 font-semibold rounded-md">
+                <IoArrowBackOutline className="text-zinc-600" /> Go Back
             </Link>
 
             <div className="max-w-5xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl p-8 relative">
@@ -109,7 +126,7 @@ function ProjectInfo() {
                     </button>
 
                     <button
-                        onClick={() => setDeleteProject(true) }
+                        onClick={() => setDeleteProject(true)}
                         className="
                             px-3 py-2 rounded-lg
                             bg-red-500/20 text-red-200
@@ -216,13 +233,13 @@ function ProjectInfo() {
             }
 
             {
-                deleteProject && 
-                <ConfirmModal 
-                    isOpen={deleteProject} 
-                    title = "Delete Project"
-                    message = "Are you sure you want to delete this project? This action cannot be undone."
+                deleteProject &&
+                <ConfirmModal
+                    isOpen={deleteProject}
+                    title="Delete Project"
+                    message="Are you sure you want to delete this project? This action cannot be undone."
                     onConfirm={() => handleDelete()}
-                    onCancel={ () => setDeleteProject(false)}
+                    onCancel={() => setDeleteProject(false)}
                 />
             }
         </div>

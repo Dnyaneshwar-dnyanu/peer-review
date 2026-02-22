@@ -3,10 +3,12 @@ import { useParams } from "react-router-dom";
 import { toast } from 'react-toastify'
 import ProjectCard from "../components/ProjectCard";
 import EvaluateProject from "../components/EvaluateProject";
+import axios from "axios";
 import { Link } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { IoReloadSharp } from "react-icons/io5";
+import Loader from "../components/Loader";
 
 function StudentRoom() {
      const roomID = useParams().roomID;
@@ -20,28 +22,35 @@ function StudentRoom() {
      useEffect(() => {
           getRoomData();
 
-          let interval = setInterval(getRoomData, 5000);
+          let interval = setInterval(getRoomData, 3000);
 
           return () => clearInterval(interval);
      }, []);
 
      let getRoomData = async () => {
-          let res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/getRoomData/${roomID}`, {
-               credentials: 'include'
-          });
+          try {
+               const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/getRoomData/${roomID}`, {
+                    withCredentials: true
+               });
 
-          if (res.status === 200) {
-               let data = await res.json()
+               const data = res.data;
 
                if (data.room.status === 'CLOSED') {
+                    toast.info("Classroom Closed");
                     navigate('/student/dashboard');
-                    return;
-               }
-               setRoom(data.room);
-               setProjects(data.projects);
-          }
 
-          setLoading(false);
+               } else {
+                    setRoom(data.room);
+                    setProjects(data.projects);
+               }
+
+          } catch (err) {
+               console.error(err);
+               toast.error("Something error occurred!");
+
+          } finally {
+               setLoading(false);
+          }
      }
 
      let handleChange = (e) => {
@@ -50,29 +59,34 @@ function StudentRoom() {
 
      let submitProject = async () => {
           if (form.title.trim().length <= 3) {
-               toast.error('Invalid details...');
-               return;
+               return toast.error('Invalid details...');
           }
 
-          let res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/add/${roomID}`, {
-               method: "POST",
-               credentials: "include",
-               headers: { 'Content-type': 'application/json' },
-               body: JSON.stringify(form)
-          });
+          try {
+               setLoading(true);
 
-          if (res.status === 200) {
+               const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/add/${roomID}`,
+                    form, { withCredentials: true }
+               );
+
+               if (res.status !== 200) throw new Error("Failed");
+
                setForm({ title: "", description: "" });
                toast.success('Project added successfully!');
-          }
 
-          getRoomData();
+               getRoomData();
+
+          } catch (err) {
+               console.error(err);
+               toast.error("Something error occurred!");
+
+          } finally {
+               setLoading(false);
+          }
      }
 
      if (loading)
-          return <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
-               <IoReloadSharp className="loader" />
-          </div>
+          return <Loader />
 
      return (
           <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black p-6 relative">
@@ -119,7 +133,7 @@ function StudentRoom() {
                                    <p className="text-white/70">Anyone haven't submitted any project yet.</p>
                                    :
                                    projects.map(project => {
-                                        return <ProjectCard key={project._id} project={project} isAdmin={false} isActive={selectedProject?._id === project._id} onSelectProject={setSelectedProject}  />
+                                        return <ProjectCard key={project._id} project={project} isAdmin={false} isActive={selectedProject?._id === project._id} onSelectProject={setSelectedProject} />
                                    })
                               }
                          </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { FaProjectDiagram, FaPlus, FaUsers } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import ProjectCard from "../components/ProjectCard";
@@ -9,6 +10,7 @@ import { MdOutlineSignalWifiStatusbarConnectedNoInternet4, MdOutlineSignalWifiSt
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import { IoReloadSharp } from "react-icons/io5";
+import Loader from "../components/Loader";
 
 function ClassroomPage() {
   let roomId = useParams().roomID;
@@ -22,58 +24,72 @@ function ClassroomPage() {
   useEffect(() => {
     getRoomData();
 
-    let interval = setInterval(getRoomData, 5000);
+    let interval = setInterval(getRoomData, 3000);
 
     return () => clearInterval(interval);
   }, []);
 
   let getRoomData = async () => {
-    let res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/getRoomData/${roomId}`, {
-      method: 'GET',
-      credentials: 'include'
-    });
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/getRoomData/${roomId}`, {
+        withCredentials: true
+      });
 
-    if (res.status === 200) {
-      let data = await res.json();
+      const data = res.data;
       setRoom(data.room);
       setProjects(data.projects);
       setRoomCode(data.room.roomCode);
-    }
 
-    setLoading(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Something error occurred!");
+
+    } finally {
+      setLoading(false);
+    }
   }
 
   let openRoom = async () => {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    let res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/openRoom/${roomId}`, {
-      method: 'GET',
-      credentials: 'include'
-    });
+      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/openRoom/${roomId}`, {
+        withCredentials: true
+      });
 
-    if (res.status === 200) {
-      let data = await res.json();
-      setRoomCode(data.code);
+      if (res.status !== 200) throw new Error("Failed!");
+
+      setRoomCode(res.data.code);
+      getRoomData();
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Something error occurred!");
     }
   }
 
   let closeRoom = async () => {
-    setLoading(true);
-    let res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/closeRoom/${roomId}`, {
-      method: 'GET',
-      credentials: 'include'
-    });
+    try {
+      setLoading(true);
 
-    if (res.status === 200) {
-      let data = await res.json();
-      setRoomCode(data.code);
+      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/closeRoom/${roomId}`, {
+        withCredentials: true
+      });
+
+      if (res.status !== 200) throw new Error("Failed!");
+
+      setRoomCode(res.data.code);
+      getRoomData();
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Something error occurred!");
+
     }
   }
 
-  if (loading) 
-    return  <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
-              <IoReloadSharp className="loader" />
-            </div>
+  if (loading)
+    return <Loader />
 
   return (
     <>

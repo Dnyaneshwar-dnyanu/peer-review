@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { FaUser, FaLock } from 'react-icons/fa';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { IoArrowBackOutline } from 'react-icons/io5';
+import Loader from '../components/Loader';
 
 function ForgotPassword() {
     const navigate = useNavigate();
     const [form, setForm] = useState({ email: "", password: "", confirmPassword: "" });
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value })
@@ -15,29 +18,43 @@ function ForgotPassword() {
 
     const changePassword = async () => {
 
-        if(form.password != form.confirmPassword) {
-            toast.error('Password and Confirm password should be same');
-            return;
+        if (form.password != form.confirmPassword) {
+            return toast.error('Password and Confirm password should be same');
         }
 
-        let res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/updatePassword`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(form),
-        });
-
-        let data = await res.json();
-
-        if (data.success) {
-            toast.success("Password Updated Successfully!");
-            navigate('/login');
+        if (form.password.trim().length < 4) {
+            return toast.error('Password should contain atleast 4 characters');
         }
-        else {
-            toast.error(data.message);
+
+        try {
+            setLoading(true);
+
+            const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/updatePassword`,
+                form, { withCredentials: true }
+            );
+
+            if (res.status !== 200) throw new Error("Failed");
+
+            if (res.data.success) {
+                toast.success("Password Updated Successfully!");
+                navigate('/login');
+
+            } else 
+                toast.error(res.data.message);
+            
             setForm({ email: "", password: "", confirmPassword: "" });
+
+        } catch (err) {
+            console.error(err);
+            toast.error("Something error occurred!");
+
+        } finally {
+            setLoading(false);
         }
     };
+
+    if (loading)
+        return <Loader />
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">

@@ -26,8 +26,6 @@ router.get('/getData', validateUser, async (req, res) => {
      res.send({ success: true, user: user });     
 });
 
-
 router.get('/logoutUser', validateUser, logoutUser);
-
 
 module.exports = router;

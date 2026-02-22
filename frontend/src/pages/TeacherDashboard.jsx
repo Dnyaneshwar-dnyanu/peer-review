@@ -4,8 +4,9 @@ import { IoMdAdd } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 import RoomCard from "../components/RoomCard";
 import { toast } from "react-toastify";
-import { IoReloadSharp } from "react-icons/io5";
+import axios from "axios";
 import { IoMdMenu, IoMdClose } from "react-icons/io";
+import Loader from "../components/Loader";
 
 function TeacherDashboard() {
      const navigate = useNavigate();
@@ -19,37 +20,64 @@ function TeacherDashboard() {
      }, []);
 
      const getUser = async () => {
-          let res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/getData`, {
-               method: 'GET',
-               credentials: 'include'
-          });
+          try {
+               setLoading(true);
 
-          if (res.status === 200) {
-               let data = await res.json();
-               setUser(data.user);
+               const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/getData`, {
+                    withCredentials: true
+               });
+
+               if (res.status !== 200) throw new Error("Failed");
+               setUser(res.data.user);
+
+          } catch (err) {
+               console.error(err);
+               toast.error("Something error occurred!");
+
+          } finally {
+               setLoading(false);
+          }
+     }
+
+     const getDisplayName = (name) => {
+          let titles = ["dr", "mr", "mrs", "ms", "prof"];
+          
+          const parts = name.trim().split(" ");
+          const first = parts[0].toLowerCase().replace(".", "");
+
+          if (titles.includes(first)) {
+               return parts[1] ? `${parts[0]} ${parts[1]}` : parts[0]; 
           }
 
-          setLoading(false);
+          return parts[0];
      }
 
      const logout = async () => {
-          const res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/logoutUser`, {
-               method: "GET",
-               credentials: "include"
-          });
+          try {
+               setLoading(true);
 
-          let data = await res.json();
+               const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/logoutUser`, {
+                    withCredentials: true
+               });
+     
+               if (res.status !== 200) throw new Error("Failed");
+     
+               if (!res.data.auth) {
+                    toast.info('Logged out successfully!');
+                    navigate('/login');
+               }
 
-          if (!data.auth) {
-               toast.info('Logged out successfully!');
-               navigate('/login');
+          } catch (err) {
+               console.error(err);
+               toast.error("Something error occurred!");
+
+          } finally {
+               setLoading(false);
           }
      }
 
      if (loading)
-          return <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
-               <IoReloadSharp className="loader" />
-          </div>
+          return <Loader />
 
      return (
           <div className='min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black flex'>
@@ -88,7 +116,7 @@ function TeacherDashboard() {
                     <IoMdMenu onClick={() => { setShowMenu(true) }} className="menuBar text-3xl " />
 
                     {/* Greeting Section */}
-                    <h1 className="text-4xl font-bold mb-2">Welcome back, {user && user.name.split(' ')[0]}!</h1>
+                    <h1 className="text-4xl font-bold mb-2">Welcome back, {user && getDisplayName(user.name)}!</h1>
                     <p className="text-white/80 mb-10">Here’s your dashboard overview</p>
 
                     {/* Stats Cards */}

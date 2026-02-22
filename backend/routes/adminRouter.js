@@ -91,7 +91,6 @@ router.get('/closeRoom/:roomID', validateUser, async (req, res) => {
      res.send({ success: true, code: room.roomCode, message: "Room Closed Successfully" });
 });
 
-
 router.delete('/:roomID/delete', validateUser, async (req, res) => {
      try {
           let roomID = req.params.roomID;

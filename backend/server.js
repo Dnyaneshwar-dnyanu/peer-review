@@ -23,6 +23,11 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.use((req, res, next) => {
+     console.log("Incoming:", req.method, req.url);
+     next();
+});
+
 app.use('/api/auth', authRouter);
 
 app.use('/admin', adminRouter);
@@ -32,9 +37,9 @@ app.use('/student', userRouter);
 app.use('/projects', projectRouter)
 
 app.get('/', (req, res) => {
-     res.send("Hello Brother");
+     res.send("Peer Review Server is Working Fine");
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });

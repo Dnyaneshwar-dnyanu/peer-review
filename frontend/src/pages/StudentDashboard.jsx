@@ -2,12 +2,13 @@ import { useRef, useState, useEffect } from "react";
 import { FaHome, FaTasks, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import { toast } from "react-toastify";
 import { IoReloadSharp, IoEnterSharp } from "react-icons/io5";
 import { IoMdMenu, IoMdClose } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
 import ConfirmModal from "../components/ConfirmModel";
-import axios from "axios";
+ import Loader from "../components/Loader";
 
 
 function StudentDashboard() {
@@ -25,82 +26,99 @@ function StudentDashboard() {
   }, []);
 
   const getUser = async () => {
-    let res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/getData`, {
-      method: 'GET',
-      credentials: 'include'
-    });
+    try {
+      setLoading(true);
 
-    if (res.status === 200) {
-      let data = await res.json();
-      setUser(data.user);
+      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/getData`, {
+        withCredentials: true
+      });
+
+      setUser(res.data.user);
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Something error occurred!")
+
+    } finally {
+      setLoading(false);
     }
 
-    setLoading(false);
   }
 
   const logout = async () => {
-    const res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/logoutUser`, {
-      method: "GET",
-      credentials: "include"
-    });
+    try {
+      setLoading(true);
 
-    let data = await res.json();
+      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/logoutUser`, {
+        withCredentials: true
+      });
 
-    if (!data.auth) {
-      toast.info('Logged out successfully!')
-      navigate('/login');
+      if (!res.data.auth) {
+        toast.info('Logged out successfully!')
+        navigate('/login');
+      }
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Something error occurred!");
+
+    } finally {
+      setLoading(false);
     }
   }
 
   const enterRoom = async () => {
-    const res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/student/room/${roomCode}`, {
-      method: 'GET',
-      credentials: 'include'
-    });
+    try {
+      setLoading(true);
 
-    if (res.status === 200) {
-      let data = await res.json();
+      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/student/room/${roomCode}/join`, {
+        withCredentials: true
+      });
 
-      if (data.success) {
-        navigate(`/student/room/${data.roomID}`);
+      if (res.data.success) {
+        navigate(`/student/room/${res.data.roomID}`);
+
+      } else {
+        toast.error(res.data.message);
       }
-      else {
-        toast.error(data.message);
-      }
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Something error occurred!");
+
+    } finally {
+      setLoading(false);
     }
-  }
-
-  const getDeleteButton = (projectID) => {
-    return <ConfirmModal
-      isOpen={true}
-      title="Delete Project"
-      message="Are you sure you want to delete this project? This action cannot be undone."
-      onConfirm={() => handleDelete(projectID)}
-      onCancel={() => setDeleteProject(false)}
-    />
   }
 
   const handleDelete = async (projectID) => {
-    const res = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${projectID}/delete`,
-      { withCredentials: true }
-    );
+    try {
+      const res = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${projectID}/delete`,
+        { withCredentials: true }
+      );
 
-    if (res.status) {
-      toast.success(res.data.message);
-    }
-    else {
-      toast.error(res.data.message);
-    }
+      if (res.status) {
+        toast.success(res.data.message);
+      }
+      else {
+        toast.error(res.data.message);
+      }
 
-    getUser();
-    setDeleteProject(null);
+      getUser();
+      setDeleteProject(null);
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Something error occurred!");
+
+    } finally {
+      setLoading(false);
+    }
   }
 
 
   if (loading)
-    return <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
-      <IoReloadSharp className="loader" />
-    </div>
+    return <Loader />
 
   return (
     <>

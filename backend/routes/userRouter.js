@@ -5,7 +5,7 @@ const roomModel = require('../models/Room');
 const userModel = require('../models/User');
 
 
-router.get('/room/:roomCode', validateUser, async (req, res) => {
+router.get('/room/:roomCode/join', validateUser, async (req, res) => {
      let room = await roomModel.findOne({ roomCode: req.params.roomCode });
 
      if (room) {

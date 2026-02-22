@@ -6,7 +6,6 @@ const roomModel = require('../models/Room');
 const reviewModel = require('../models/Reviews');
 const { validateUser } = require('../middleware/validateUser');
 
-
 router.get('/:projectID/getInfo', validateUser, async (req, res) => {
     let project = await projectModel.findOne({ _id: req.params.projectID })
         .populate({
@@ -21,7 +20,8 @@ router.get('/:projectID/getInfo', validateUser, async (req, res) => {
             }
         });
     res.send({ success: true, project: project });
-})
+});
+
 router.post('/add/:roomID', validateUser, async (req, res) => {
     let { title, description } = req.body;
 
@@ -95,14 +95,16 @@ router.get('/getComments/:projectID', validateUser, async (req, res) => {
 router.put('/:projectID/update', async (req, res) => {
     let { title, description } = req.body;
 
-    let project = await projectModel.findOneAndUpdate({ _id: req.params.projectID }, { $set: { title: title, description: description } });
+    let project = await projectModel.findOneAndUpdate(
+        { _id: req.params.projectID }, 
+        { $set: { title: title, description: description } }
+    );
 
     if (!project) {
         return res.status(400).send({ success: false, message: "Failed to  update project details!" });
     }
 
     res.send({ success: true, message: "Project details update successfully!" });
-
 });
 
 router.delete('/:projectID/delete', validateUser, async (req, res) => {

@@ -1,6 +1,8 @@
 import { Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { IoReloadSharp } from "react-icons/io5";
+import Loader from "./Loader";
 
 function ProtectedRoute({ children, allowedRoles }) {
      const [userRole, setUserRole] = useState(null);
@@ -11,32 +13,32 @@ function ProtectedRoute({ children, allowedRoles }) {
      }, []);
 
      const checkAuth = async () => {
-          let res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/validateUser`, {
-               method: 'GET',
-               credentials: "include"
-          });
+          try {
+               const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/validateUser`, {
+                    withCredentials: true
+               });
 
-          if (res.status === 200) {
-               let data = await res.json();
-               if (!data.auth) {
+               if (!res.data.auth) {
                     setUserRole(undefined);
+               } else {
+                    setUserRole(res.data.user.role);
                }
-               else {
-                    setUserRole(data.user.role);
-               }
+          } catch (err) {
+               console.error(err);
+               setUserRole(undefined);
+               toast.error("Something error occurred!");
+
+          } finally {
+               setLoading(false);
           }
-
-          setLoading(false);
      }
 
-     if (loading) 
-         return  <div className="min-h-screen w-full absolute top-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black">
-                   <IoReloadSharp className="loader" />
-                 </div>
+     if (loading) return <Loader />
 
-     if (allowedRoles && !allowedRoles.includes(userRole) || !userRole) {
+     if (!userRole) return <Navigate to='/login' replace />;
+
+     if (allowedRoles && !allowedRoles.includes(userRole) || !userRole) 
           return <Navigate to='/login' replace />;
-     }
 
      return children;
 }

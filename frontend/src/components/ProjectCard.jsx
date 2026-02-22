@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 
@@ -12,14 +13,18 @@ function ProjectCard({ project, isAdmin, roomID, isActive, onSelectProject }) {
   }, [project._id]);
 
   const isItUsersProject = async () => {
-    const res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/student/${project._id}/isUserProject`, {
-      method: "GET",
-      credentials: "include"
-    });
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/student/${project._id}/isUserProject`, {
+        withCredentials: true
+      });
 
-    if (res.status === 200) {
-      const data = await res.json();
-      setViewType(data.status ? "viewReview" : "addReview");
+      if (res.status !== 200) throw new Error("Failed");
+      
+      setViewType(res.data.status ? "viewReview" : "addReview");
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Something error occurred!");
     }
   }
 
@@ -61,10 +66,10 @@ function ProjectCard({ project, isAdmin, roomID, isActive, onSelectProject }) {
           <button onClick={(e) => {
             e.stopPropagation();
             onSelectProject(project);
-          }} 
-          className="px-2 py-1 text-sm bg-white text-indigo-900 font-semibold rounded-md hover:bg-gray-200 transition">
+          }}
+            className="px-2 py-1 text-sm bg-white text-indigo-900 font-semibold rounded-md hover:bg-gray-200 transition">
             <HashLink to="#review" smooth>
-              {viewType === "viewReview" ? "View Review" : "addReview"}
+              {viewType === "viewReview" ? "View Review" : "Add Review"}
             </HashLink>
           </button>
         </div>

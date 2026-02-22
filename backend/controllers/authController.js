@@ -7,7 +7,11 @@ const roomModel = require('../models/Room');
 module.exports.registerUser = async (req, res) => {
      let user;
      if (req.body.role === "student") {
-          user = await userModel.findOne({ usn: req.body.usn });
+          user = await userModel.findOne(
+               { $or: [
+                    { usn: req.body.usn}, 
+                    {email: req.body.email}
+               ]});
      }
      else {
           user = await userModel.findOne({ email: req.body.email });
@@ -41,7 +45,6 @@ module.exports.registerUser = async (req, res) => {
 }
 
 module.exports.loginUser = async (req, res) => {
-
      let user = await userModel.findOne({ email: req.body.email });
 
      if (user) {

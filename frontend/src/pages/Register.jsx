@@ -1,11 +1,14 @@
+import axios from 'axios';
 import React, { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import Loader from '../components/Loader';
 
 function Register() {
      const navigate = useNavigate();
      const [form, setForm] = useState({ name: "", usn: "", email: "", role: "", password: "" });
      const [userRole, setUserRole] = useState('student');
+     const [loading, setLoading] = useState(false);
 
      const handleChange = (e) => {
           setForm({ ...form, [e.target.name]: e.target.value });
@@ -14,30 +17,61 @@ function Register() {
           }
      }
 
+     function isValidEmail(email) {
+          const regex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,}/;
+          return regex.test(email);
+     }
+
+     function isValidUSN(usn) {
+          const regex = /^1MS\d{2}[A-Z]{2}\d{3}$/
+          return regex.test(usn);
+     }
+
      const register = async () => {
-          let res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/register`, {
-               method: "POST",
-               headers: { "Content-Type": "application/json" },
-               credentials: "include",
-               body: JSON.stringify(form)
-          });
 
-          let data = await res.json();
+          form.usn = form.usn.toUpperCase();
 
-          if (data.auth) {
-               if(data.user.role === 'student') {
-                    navigate('/student/dashboard');
-               }
-               else if (data.user.role === 'admin') {
-                    navigate('/admin/dashboard');
-               }
-               toast.success("Successfully Registered!");
+          if (form.name.trim().length < 4 ||
+               !isValidEmail(form.email) ||
+               form.role.trim().length === 0 ||
+               (form.role === 'student' && !isValidUSN(form.usn)) ||
+               form.password.trim().length < 4) {
+
+               return toast.error("Enter valid details");
           }
-          else {
-               toast.error(data.message);
+
+          try {
+               setLoading(true);
+
+               const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/register`,
+                    form, { withCredentials: true }
+               );
+
+               const data = res.data;
+
+               if (data.auth) {
+                    if (data.user.role === 'student') {
+                         navigate('/student/dashboard');
+                    }
+                    else if (data.user.role === 'admin') {
+                         navigate('/admin/dashboard');
+                    }
+                    toast.success("Successfully Registered!");
+               }
+               else {
+                    toast.error(data.message);
+               }
+          } catch (err) {
+               console.error(err);
+               toast.error("Something error occurred!");
+
+          } finally {
+               setLoading(false);
           }
      }
 
+     if (loading)
+          return <Loader />
 
      return (
           <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
@@ -82,8 +116,8 @@ function Register() {
                                    value={form.usn}
                                    onChange={handleChange}
                                    autoComplete='off'
-                                   placeholder="USN"
-                                   className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
+                                   placeholder="USN ( Ex: 1MS23CS063 )"
+                                   className="w-full p-3 uppercase rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
                               />
                          }
 
@@ -108,7 +142,9 @@ function Register() {
                          />
 
                          <button
-                              onClick={register}
+                              onClick={() => {
+                                   register();
+                              }}
                               className="w-full py-3 mt-2 text-lg bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition"
                          >
                               Register

@@ -4,26 +4,34 @@ import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
 import ConfirmModal from "./ConfirmModel";
 import axios from "axios";
+import Loader from "./Loader";
 
 function RoomCard({ Room, onUpdate }) {
      const navigate = useNavigate();
-
+     const [loading, setLoading] = useState(false);
      const [deleteRoom, setDeleteRoom] = useState(false);
 
      const handleDelete = async (RoomId) => {
-          const res = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/${RoomId}/delete`, 
-               { withCredentials: true }
-          );
+          try {
+               const res = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/${RoomId}/delete`, 
+                    { withCredentials: true }
+               );
+     
+               if (res.status === 200) {
+                    toast.success(res.data.message);
+               }
+               else {
+                    toast.error(res.data.message);
+               }
+     
+               onUpdate();
+               setDeleteRoom(false);
 
-          if (res.status) {
-               toast.success(res.data.message);
-          }
-          else {
-               toast.error(res.data.message);
-          }
+          } catch (err) {
+               console.error(err);
+               toast.error("Something error occurred!");
 
-          onUpdate();
-          setDeleteRoom(false);
+          }
      }
 
      return (

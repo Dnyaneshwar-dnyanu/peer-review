@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import Loader from "../components/Loader";
 
 function CreateRoom() {
      const navigate = useNavigate();
@@ -12,45 +14,54 @@ function CreateRoom() {
           section: "",
           maxMarks: "",
      });
+     const [loading, setLoading] = useState(false);
 
      const createRoom = async () => {
-          if (form.roomName.trim().length < 4 || 
-               form.semester.trim().length === 0 || 
-               form.section.trim().length === 0 || 
+          if (form.roomName.trim().length < 4 ||
+               form.semester.trim().length === 0 ||
+               form.section.trim().length === 0 ||
                parseInt(form.maxMarks.trim()) < 0 ||
-               parseInt(form.maxMarks.trim()) > 100 
+               parseInt(form.maxMarks.trim()) > 100
           ) {
                return toast.error("Enter valid details");
           }
-          
-          const res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/createRoom`, {
-               method: 'POST',
-               credentials: "include",
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify(form)
-          });
 
-          if (res.status === 200) {
-               toast.success("Classroom created successfully!")
-               navigate('/admin/dashboard');
-          }
+          try {
+               const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/createRoom`,
+                    form, { withCredentials: true }
+               );
+
+               if (res.status === 200) {
+                    toast.success("Classroom created successfully!");
+                    navigate('/admin/dashboard');
+               }
+
+          } catch (err) {
+               console.error(err);
+               toast.error("Something error occurred!");
+
+          } 
      }
 
      const handleChange = (e) => {
           setForm({ ...form, [e.target.name]: e.target.value });
      };
 
+
+     if (loading)
+          return <Loader />
+
      return (
           <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
-               <Link to='/admin/dashboard' className="absolute top-6 left-6 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> 
-                    <IoArrowBackOutline className="text-zinc-600" /> 
+               <Link to='/admin/dashboard' className="absolute top-6 left-6 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md">
+                    <IoArrowBackOutline className="text-zinc-600" />
                     Back to Home
                </Link>
                <div className="
-        w-full max-w-lg p-10 rounded-2xl shadow-2xl
-        bg-white/10 backdrop-blur-xl border border-white/20
-        transform transition duration-500 hover:scale-[1.02]
-      ">
+                    w-full max-w-lg p-10 rounded-2xl shadow-2xl
+                    bg-white/10 backdrop-blur-xl border border-white/20
+                    transform transition duration-500 hover:scale-[1.02]
+               ">
 
                     <h1 className="text-3xl font-bold text-white text-center mb-6">
                          Create a Room
@@ -68,8 +79,7 @@ function CreateRoom() {
                               onChange={handleChange}
                               autoComplete="off"
                               placeholder="Room Name (Ex: AI Lab, DBMS Section A)"
-                              className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 
-                       border border-white/30 focus:bg-white/30 outline-none"
+                              className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
                          />
 
                          <select

@@ -1,44 +1,65 @@
 import React, { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import { toast } from "react-toastify";
+import axios from "axios";
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 function Login() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const login = async () => {
-    let res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(form),
-    });
 
-    let data = await res.json();
+    if (form.email.trim().length < 4 || form.password.trim().length < 4) {
+      return toast.error("Invalid email or password");
+    }
 
-    if (data.auth) {
-      if (data.user.role === 'student') {
-        navigate('/student/dashboard');
-      }
-      else if (data.user.role === 'admin') {
-        navigate('/admin/dashboard');
+    try {
+      setLoading(true);
+
+      const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/login`,
+        form, { withCredentials: true }
+      );
+
+      if (res.status !== 200) throw new Error("Failed");
+
+      const data = res.data;
+
+      if (data.auth) {
+        if (data.user.role === 'student') {
+          navigate('/student/dashboard');
+        }
+        else if (data.user.role === 'admin') {
+          navigate('/admin/dashboard');
+        }
+        else {
+          navigate('/login');
+        }
+        toast.success("logged in successfully!");
       }
       else {
-        navigate('/login');
+        toast.error(data.message);
+        setForm({ email: "", password: "" });
       }
-      toast.success("logged in successfully!");
-    }
-    else {
-      toast.error(data.message);
-      setForm({ email: "", password: "" });
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Something error occurred!");
+
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading)
+    return <Loader />
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">

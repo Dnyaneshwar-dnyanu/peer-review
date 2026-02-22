@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 function EvaluateForm({ project, maxMarks }) {
     const [form, setForm] = useState({ marks: 0, comment: "" });
@@ -13,14 +14,74 @@ function EvaluateForm({ project, maxMarks }) {
             isItUsersProject();
         }
 
-        let interval = setInterval(() => {
-            if (project) {
-                getComments();
-            }
-        }, 5000);
+        let interval = setInterval(getComments, 3000);
 
         return () => clearInterval(interval);
     }, [project]);
+
+    const addReview = async () => {
+        if (parseInt(form.marks) < 5)
+            return toast.error("Enter Valid Marks");
+
+        try {
+            const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/addReview/${project._id}`,
+                form, { withCredentials: true }
+            );
+
+            if (res.status !== 200) throw new Error("Failed");
+
+            const data = res.data;
+            if (data.success) {
+                toast.success(data.message);
+            } else {
+                toast.error(data.message);
+            }
+
+            getComments();
+            setForm({ marks: 0, comment: "" });
+
+        } catch (err) {
+            console.error(err);
+            toast.error("Something error occurred!");
+        }
+    }
+
+    const getComments = async () => {
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/getComments/${project._id}`, {
+                withCredentials: true
+            });
+
+            if (res.status !== 200) throw new Error("Failed");
+
+            setReviews(res.data.reviews);
+            setMarks(res.data.avgMarks);
+
+        } catch (err) {
+            console.error(err);
+            toast.error("Something error occurred!");
+        }
+    }
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    }
+
+    const isItUsersProject = async () => {
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/student/${project._id}/isUserProject`, {
+                withCredentials: true
+            });
+
+            if (res.status !== 200) throw new Error("Failed");
+
+            setViewType(res.data.status ? "viewReview" : "addReview");
+
+        } catch (err) {
+            console.error(err);
+            toast.error("Something error occurred!");
+        }
+    }
 
     if (!project) {
         return (
@@ -35,60 +96,6 @@ function EvaluateForm({ project, maxMarks }) {
             </div>
         );
     }
-
-    const addReview = async () => {
-        const res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/addReview/${project._id}`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(form)
-        });
-
-        if (res.status === 200) {
-            let data = await res.json();
-            if (data.success) {
-                toast.success(data.message);
-            }
-            else {
-                toast.error(data.message);
-            }
-            getComments();
-            
-        } else {
-            toast.error("Error in adding review")
-        }
-        setForm({ marks: 0, comment: "" });
-    }
-
-    const getComments = async () => {
-        const res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/getComments/${project._id}`, {
-            method: 'GET',
-            credentials: 'include',
-        });
-
-        if (res.status === 200) {
-            let data = await res.json();
-            setReviews(data.reviews);
-            setMarks(data.avgMarks);
-        }
-    }
-
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    }
-
-    const isItUsersProject = async () => {
-        const res = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/student/${project._id}/isUserProject`, {
-            method: "GET",
-            credentials: "include"
-        });
-
-        if (res.status === 200) {
-            const data = await res.json();
-            setViewType(data.status ? "viewReview" : "addReview");
-        }
-    }
-
 
     return (
         <div className="
