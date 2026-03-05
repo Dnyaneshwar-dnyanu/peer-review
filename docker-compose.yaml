@@ -1,0 +1,70 @@
+version: "3.8"
+
+services: 
+
+  mongo: 
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: qwerty
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - peer-review-network
+
+  backend:
+    build: ./backend
+    image: dnyanu0506/peer-review-backend:1.1
+    ports:
+      - 3000:3000
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      MONGO_URI: mongodb://admin:qwerty@mongo:27017/peerreviewDB?authSource=admin
+    networks:
+      - peer-review-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend:
+    build: ./frontend
+    image: dnyanu0506/peer-review-frontend:1.1
+    ports:
+      - 5173:5173
+    depends_on:
+      - backend 
+    networks:
+      - peer-review-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+  
+  mongo-express:
+    image: mongo-express:latest
+    ports:
+      - 8081:8081
+    environment: 
+      ME_CONFIG_MONGODB_URL: mongodb://admin:qwerty@mongo:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: mongoexpressuser
+      ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - peer-review-network
+
+volumes:
+  mongo-data:
+
+networks:
+  peer-review-network:
+    driver: bridge

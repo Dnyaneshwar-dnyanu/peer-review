@@ -24,12 +24,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
-
-app.use('/admin', adminRouter);
-
-app.use('/student', userRouter);
-
-app.use('/projects', projectRouter)
+app.use('/api/admin', adminRouter);
+app.use('/api/student', userRouter);
+app.use('/api/projects', projectRouter)
 
 app.get('/', (req, res) => {
      res.send("Peer Review Server is Working Fine");

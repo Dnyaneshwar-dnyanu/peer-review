@@ -25,7 +25,7 @@ function ProjectInfo() {
         try {
             setLoading(true);
 
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${projectID}/getInfo`,
+            const res = await axios.get(`/api/projects/${projectID}/getInfo`,
                 { withCredentials: true }
             );
 
@@ -50,7 +50,7 @@ function ProjectInfo() {
         try {
             setLoading(true);
 
-            const res = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${project._id}/update`,
+            const res = await axios.put(`/api/projects/${project._id}/update`,
                 updatedData,
                 { withCredentials: true }
             );
@@ -74,7 +74,7 @@ function ProjectInfo() {
         if (!project?._id) return;
 
         try {
-            const res = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${project._id}/delete`,
+            const res = await axios.delete(`/api/projects/${project._id}/delete`,
                 { withCredentials: true }
             );
 
@@ -91,7 +91,7 @@ function ProjectInfo() {
         } catch (err) {
             console.error(err);
             toast.error("Something error occurred!");
-            
+
         } finally {
             setDeleteProject(false);
         }
@@ -151,7 +151,7 @@ function ProjectInfo() {
                         {project?.description}
                     </p>
 
-                    <div className="flex flex-wrap gap-3 mt-5 text-sm">
+                    <div className="flex flex-wrap gap-3 my-5 text-sm">
                         <span className="px-4 py-1.5 rounded-full bg-indigo-500/20 text-indigo-200 border border-indigo-400/30">
                             👤 {project?.student?.name}
                         </span>
@@ -164,6 +164,37 @@ function ProjectInfo() {
                             📅 {new Date(project?.submittedAt).toLocaleDateString()}
                         </span>
                     </div>
+                    {/* Teamates Info */}
+                    {
+                        project.type === "group" && project.members?.length > 0 && (
+                            <div className="mt-3">
+                                <p className="text-white/60 text-xs mb-2 uppercase tracking-wide">
+                                    Team Members
+                                </p>
+
+                                <div className="flex flex-wrap gap-2">
+                                    {project.members.map((member, index) => (
+                                        <span
+                                            key={member._id || index}
+                                            className="
+                                                flex items-center gap-2
+                                                px-3 py-1 rounded-full
+                                                bg-indigo-500/20 text-indigo-200
+                                                border border-indigo-400/30
+                                                text-xs font-medium
+                                                transition hover:bg-indigo-500/30
+                                            "
+                                        >
+                                            <span className="w-5 h-5 flex items-center justify-center rounded-full bg-indigo-400/30 text-[10px] font-bold">
+                                                {member.name?.charAt(0)}
+                                            </span>
+                                            {member.usn}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )
+                    }
                 </div>
 
                 <div className="h-px bg-white/20 my-8" />

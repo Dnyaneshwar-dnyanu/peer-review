@@ -27,7 +27,7 @@ function EvaluateForm({ project, maxMarks }) {
 
         try {
             setLoading(true);
-            const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/addReview/${project._id}`,
+            const res = await axios.post(`/api/projects/addReview/${project._id}`,
                 form, { withCredentials: true }
             );
 
@@ -51,7 +51,7 @@ function EvaluateForm({ project, maxMarks }) {
 
     const getComments = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/getComments/${project._id}`, {
+            const res = await axios.get(`/api/projects/getComments/${project._id}`, {
                 withCredentials: true
             });
 
@@ -72,7 +72,7 @@ function EvaluateForm({ project, maxMarks }) {
 
     const isItUsersProject = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/student/${project._id}/isUserProject`, {
+            const res = await axios.get(`/api/student/${project._id}/isUserProject`, {
                 withCredentials: true
             });
 
@@ -107,7 +107,7 @@ function EvaluateForm({ project, maxMarks }) {
         shadow-xl text-white
         h-full">
             {/* Header */}
-            <div className="mb-8 flex md:flex-row flex-col justify-between items-start md:items-center gap-4 border-b border-white/10 pb-6">
+            <div className="mb-6 flex md:flex-row flex-col justify-between items-start md:items-center gap-4 border-b border-white/10 pb-6">
                 <div>
                     <h2 className="text-2xl font-bold capitalize">
                         {project.title}
@@ -130,6 +130,36 @@ function EvaluateForm({ project, maxMarks }) {
                     </div>
                 </div>
             </div>
+
+            {
+                project.type === "group" && project.members?.length > 0 && (
+                    <div className="mt-2 mb-6">
+                        <p className="text-white/60 text-xs mb-2 uppercase tracking-wide">
+                            Team Members
+                        </p>
+
+                        <div className="flex flex-wrap gap-2">
+                            {project.members.map((member, index) => (
+                                <span
+                                    key={member._id || index}
+                                    className="
+                                        flex items-center gap-2
+                                        px-3 py-1 rounded-full
+                                        bg-indigo-500/20 text-indigo-200
+                                        border border-indigo-400/30
+                                        text-xs font-medium
+                                        transition hover:bg-indigo-500/30
+                                ">
+                                    <span className="w-5 h-5 flex items-center justify-center rounded-full bg-indigo-400/30 text-[10px] font-bold">
+                                        {member.name?.charAt(0)}
+                                    </span>
+                                    {member.usn}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )
+            }
 
             {viewType === "addReview" &&
                 <div className="mb-8 p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg">

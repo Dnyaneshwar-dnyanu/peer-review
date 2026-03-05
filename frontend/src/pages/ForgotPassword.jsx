@@ -29,7 +29,7 @@ function ForgotPassword() {
         try {
             setLoading(true);
 
-            const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/updatePassword`,
+            const res = await axios.post(`/api/auth/updatePassword`,
                 form, { withCredentials: true }
             );
 

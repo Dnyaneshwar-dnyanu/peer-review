@@ -13,7 +13,7 @@ function RoomCard({ Room, onUpdate }) {
 
      const handleDelete = async (RoomId) => {
           try {
-               const res = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/${RoomId}/delete`,
+               const res = await axios.delete(`/api/admin/${RoomId}/delete`,
                     { withCredentials: true }
                );
 

@@ -99,3 +99,19 @@ module.exports.logoutUser = async (req, res) => {
      res.cookie('token', "");
      res.send({ auth: false });
 }
+
+module.exports.validateStudent = async (req, res) => {
+     const usn = req.body.usn;
+
+     if (req.body.usn === req.user.usn) {
+          return res.send({ success: false, message: "You are already in the group"})
+     }
+
+     const user = await userModel.findOne({ usn: usn });
+
+     if (!user) {
+          return res.send({ success: false, message: "Invalid USN"});
+     }
+
+     res.send({ success: true, _id: user._id, name: user.name });
+}

@@ -29,7 +29,7 @@ function StudentDashboard() {
     try {
       setLoading(true);
 
-      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/getData`, {
+      const res = await axios.get(`/api/auth/getData`, {
         withCredentials: true
       });
 
@@ -49,7 +49,7 @@ function StudentDashboard() {
     try {
       setLoading(true);
 
-      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/logoutUser`, {
+      const res = await axios.get(`/api/auth/logoutUser`, {
         withCredentials: true
       });
 
@@ -71,7 +71,7 @@ function StudentDashboard() {
     try {
       setLoading(true);
 
-      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/student/room/${roomCode}/join`, {
+      const res = await axios.get(`/api/student/room/${roomCode}/join`, {
         withCredentials: true
       });
 
@@ -93,7 +93,7 @@ function StudentDashboard() {
 
   const handleDelete = async (projectID) => {
     try {
-      const res = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/${projectID}/delete`,
+      const res = await axios.delete(`/api/projects/${projectID}/delete`,
         { withCredentials: true }
       );
 

@@ -17,7 +17,7 @@ const roomSchema = mongoose.Schema({
      status: {
           type: String,
           enum: ['OPEN', 'CLOSED'],
-          default: 'OPEN'
+          default: 'CLOSED'
      },
      participants: [
           {

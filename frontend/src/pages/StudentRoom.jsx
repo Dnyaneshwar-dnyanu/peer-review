@@ -3,20 +3,20 @@ import { useParams } from "react-router-dom";
 import { toast } from 'react-toastify'
 import ProjectCard from "../components/ProjectCard";
 import EvaluateProject from "../components/EvaluateProject";
+import AddProject from "../components/AddProject";
+import Loader from "../components/Loader";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import Loader from "../components/Loader";
 
 function StudentRoom() {
      const roomID = useParams().roomID;
      const navigate = useNavigate();
      const [room, setRoom] = useState(null);
      const [loading, setLoading] = useState(true);
-     const [disableButton, setDisableButton] = useState(false);
-     const [form, setForm] = useState({ title: "", description: "" });
-     const [projects, setProjects] = useState([]);
+     const [projects, setProjects] = useState(null);
+     const [showForm, setShowForm] = useState(false);
      const [selectedProject, setSelectedProject] = useState(null);
 
      useEffect(() => {
@@ -29,7 +29,7 @@ function StudentRoom() {
 
      let getRoomData = async () => {
           try {
-               const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/getRoomData/${roomID}`, {
+               const res = await axios.get(`/api/admin/getRoomData/${roomID}`, {
                     withCredentials: true
                });
 
@@ -53,39 +53,9 @@ function StudentRoom() {
           }
      }
 
-     let handleChange = (e) => {
-          setForm({ ...form, [e.target.name]: e.target.value });
-     }
-
-     let submitProject = async () => {
-          if (form.title.trim().length <= 3) {
-               return toast.error('Invalid details...');
-          }
-
+     async function exitRoom() {
           try {
-               setDisableButton(true);
-
-               const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/projects/add/${roomID}`,
-                    form, { withCredentials: true }
-               );
-
-               setForm({ title: "", description: "" });
-               toast.success('Project added successfully!');
-
-               getRoomData();
-
-          } catch (err) {
-               console.error(err);
-               toast.error("Something error occurred!");
-
-          } finally {
-               setDisableButton(false);
-          }
-     }
-
-     async function exitRoom () {
-          try {
-               const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/student/${roomID}/exit`, {
+               const res = await axios.get(`/api/student/${roomID}/exit`, {
                     withCredentials: true
                });
 
@@ -102,15 +72,15 @@ function StudentRoom() {
           }
      }
 
-     if (loading) 
+     if (loading)
           return <Loader />
 
      return (
           <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black p-6 relative">
-               <Link to={"/student/dashboard"} className="md:absolute relative md:mb-0 mb-4 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> 
+               <Link to={"/student/dashboard"} className="md:absolute relative md:mb-0 mb-4 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md">
                     <IoArrowBackOutline className="text-zinc-600" /> Back Home
                </Link>
-               <div className="max-w-2xl mx-auto">
+               <div className="max-w-3xl mx-auto">
                     <div className="p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl md:mb-10 mb-6">
                          <h1 className="text-4xl font-bold text-white capitalize">{room.roomName}</h1>
 
@@ -129,20 +99,28 @@ function StudentRoom() {
                          </p>
                     </div>
 
-                    <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl md:mb-10 mb-6">
-                         <h2 className="text-2xl text-white font-bold mb-6">Submit Your Project</h2>
+                    {!showForm &&
+                         <button
+                              onClick={() => setShowForm(true)}
+                              className={`
+                                   w-full px-6 py-3 mb-4 bg-white text-indigo-900 rounded-lg font-semibold 
+                                   overflow-hidden hover:bg-gray-200 transition-all duration-1000 ease-in-out
+                                   ${showForm ? 'max-h-0 opacity-0' : 'max-h-16 opacity-100'}
+                                   `}>
+                                        Click to Add Project
+                         </button>
+                    }
 
-                         <div className="flex flex-col items-center gap-2 md:px-15 text-white/80">
-                              <input type="text" name="title" value={form.title} onChange={handleChange} autoComplete='off' placeholder="Project title" className="w-full border outline-none p-3 rounded-lg bg-white/20 border-white/30 placeholder-white/70 focus:bg-white/30" />
-                              <textarea name="description" value={form.description} onChange={handleChange} placeholder="tell us about your project...." className="w-full border outline-none p-3 rounded-lg bg-white/20 border-white/30 placeholder-white/70 focus:bg-white/30"></textarea>
-                              <button onClick={submitProject}
-                                   disabled={disableButton}
-                                   className={`w-full mt-6 px-6 py-3 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition ${disableButton && "cursor-disabled"}`}>
-                                   {disableButton ? "Submitting..." : "Submit Project"}
-                              </button>
-                         </div>
-
+                    <div className={`   
+                              overflow-hidden
+                              transition-all duration-500 ease-in-out
+                              ${showForm ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'} `}>
+                         <AddProject onClose={() => {
+                              setShowForm(false);
+                              getRoomData();
+                         }} />
                     </div>
+
                </div>
                <div className="md:max-h-[90vh] w-full flex md:flex-row flex-col justify-between gap-4 p-3 px-5 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl">
                     <div className="md:w-[40%]">

@@ -24,7 +24,7 @@ function Login() {
     try {
       setLoading(true);
 
-      const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/login`,
+      const res = await axios.post(`/api/auth/login`,
         form, { withCredentials: true }
       );
 

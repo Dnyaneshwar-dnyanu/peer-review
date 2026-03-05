@@ -9,8 +9,8 @@ import { MdGetApp } from "react-icons/md";
 import { MdOutlineSignalWifiStatusbarConnectedNoInternet4, MdOutlineSignalWifiStatusbar4Bar } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
-import { IoReloadSharp } from "react-icons/io5";
 import Loader from "../components/Loader";
+import { toast } from "react-toastify";
 
 function ClassroomPage() {
   let roomId = useParams().roomID;
@@ -32,7 +32,7 @@ function ClassroomPage() {
 
   let getRoomData = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/getRoomData/${roomId}`, {
+      const res = await axios.get(`/api/admin/getRoomData/${roomId}`, {
         withCredentials: true
       });
 
@@ -54,7 +54,7 @@ function ClassroomPage() {
     try {
       setCloseRoomButton(true);
 
-      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/openRoom/${roomId}`, {
+      const res = await axios.get(`/api/admin/openRoom/${roomId}`, {
         withCredentials: true
       });
 
@@ -76,7 +76,7 @@ function ClassroomPage() {
     try {
       setCloseRoomButton(true);
 
-      const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/closeRoom/${roomId}`, {
+      const res = await axios.get(`/api/admin/closeRoom/${roomId}`, {
         withCredentials: true
       });
 

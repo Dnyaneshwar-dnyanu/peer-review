@@ -1,7 +1,8 @@
 const express = require('express');
-const { registerUser, loginUser, updatePassword, logoutUser } = require('../controllers/authController');
+const { registerUser, loginUser, updatePassword, validateStudent, logoutUser } = require('../controllers/authController');
 const { validateUser } = require('../middleware/validateUser');
 const userModel = require('../models/User');
+
 const router = express();
 
 router.post('/register', registerUser);
@@ -25,6 +26,8 @@ router.get('/getData', validateUser, async (req, res) => {
 
      res.send({ success: true, user: user });     
 });
+
+router.post('/validateStudent', validateUser, validateStudent);
 
 router.get('/logoutUser', validateUser, logoutUser);
 

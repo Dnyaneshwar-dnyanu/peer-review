@@ -2,7 +2,6 @@ import axios from 'axios';
 import React, { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import Loader from '../components/Loader';
 
 function Register() {
      const navigate = useNavigate();
@@ -43,7 +42,7 @@ function Register() {
           try {
                setLoading(true);
 
-               const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/register`,
+               const res = await axios.post(`/api/auth/register`,
                     form, { withCredentials: true }
                );
 

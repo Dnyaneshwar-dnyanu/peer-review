@@ -14,7 +14,7 @@ function ProtectedRoute({ children, allowedRoles }) {
 
      const checkAuth = async () => {
           try {
-               const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/validateUser`, {
+               const res = await axios.get(`/api/auth/validateUser`, {
                     withCredentials: true
                });
 

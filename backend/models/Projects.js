@@ -7,6 +7,15 @@ const projectSchema = mongoose.Schema({
           type: Number,
           default: 0
      },
+     type: {
+          type: String,
+          enum: ['individual', 'group'],
+     },
+     members: [{
+          id: String,
+          name: String,
+          usn: String
+     }],
      student: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'User'

@@ -56,7 +56,7 @@ function TeacherDashboard() {
           try {
                setLoading(true);
 
-               const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/logoutUser`, {
+               const res = await axios.get(`/api/auth/logoutUser`, {
                     withCredentials: true
                });
      

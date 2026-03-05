@@ -27,7 +27,7 @@ function CreateRoom() {
 
           try {
                setLoading(true)
-               const res = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/admin/createRoom`,
+               const res = await axios.post(`/api/admin/createRoom`,
                     form, { withCredentials: true }
                );
 
