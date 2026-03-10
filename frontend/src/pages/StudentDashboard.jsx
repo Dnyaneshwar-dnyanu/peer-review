@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { FaHome, FaTasks, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 import { toast } from "react-toastify";
 import { IoReloadSharp, IoEnterSharp } from "react-icons/io5";
 import { IoMdMenu, IoMdClose } from "react-icons/io";
@@ -29,9 +29,7 @@ function StudentDashboard() {
     try {
       setLoading(true);
 
-      const res = await axios.get(`/api/auth/getData`, {
-        withCredentials: true
-      });
+      const res = await api.get(`/api/auth/getData`);
 
       setUser(res.data.user);
 
@@ -49,9 +47,7 @@ function StudentDashboard() {
     try {
       setLoading(true);
 
-      const res = await axios.get(`/api/auth/logoutUser`, {
-        withCredentials: true
-      });
+      const res = await api.get(`/api/auth/logoutUser`);
 
       if (!res.data.auth) {
         toast.info('Logged out successfully!')
@@ -71,9 +67,7 @@ function StudentDashboard() {
     try {
       setLoading(true);
 
-      const res = await axios.get(`/api/student/room/${roomCode}/join`, {
-        withCredentials: true
-      });
+      const res = await api.get(`/api/student/room/${roomCode}/join`);
 
       if (res.data.success) {
         navigate(`/student/room/${res.data.roomID}`);
@@ -93,9 +87,7 @@ function StudentDashboard() {
 
   const handleDelete = async (projectID) => {
     try {
-      const res = await axios.delete(`/api/projects/${projectID}/delete`,
-        { withCredentials: true }
-      );
+      const res = await api.delete(`/api/projects/${projectID}/delete`);
 
       if (res.data.success) {
         toast.success(res.data.message);

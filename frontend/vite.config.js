@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       proxy: {
         '/api': {
-          target: env.VITE_REACT_APP_BACKEND_URL || 'http://backend:3000',
+          target: env.VITE_REACT_APP_BACKEND_URL,
           changeOrigin: true,
           secure: false
         }

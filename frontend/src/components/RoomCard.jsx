@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
 import ConfirmModal from "./ConfirmModel";
-import axios from "axios";
+import api from "../api/axios";
 import Loader from "./Loader";
 
 function RoomCard({ Room, onUpdate }) {
@@ -13,9 +13,7 @@ function RoomCard({ Room, onUpdate }) {
 
      const handleDelete = async (RoomId) => {
           try {
-               const res = await axios.delete(`/api/admin/${RoomId}/delete`,
-                    { withCredentials: true }
-               );
+               const res = await api.delete(`/api/admin/${RoomId}/delete`);
 
                if (res.status === 200) {
                     toast.success(res.data.message);

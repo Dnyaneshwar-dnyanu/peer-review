@@ -5,7 +5,7 @@ import ProjectCard from "../components/ProjectCard";
 import EvaluateProject from "../components/EvaluateProject";
 import AddProject from "../components/AddProject";
 import Loader from "../components/Loader";
-import axios from "axios";
+import api from "../api/axios";
 import { Link } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
@@ -29,9 +29,7 @@ function StudentRoom() {
 
      let getRoomData = async () => {
           try {
-               const res = await axios.get(`/api/admin/getRoomData/${roomID}`, {
-                    withCredentials: true
-               });
+               const res = await api.get(`/api/admin/getRoomData/${roomID}`);
 
                const data = res.data;
 
@@ -55,9 +53,7 @@ function StudentRoom() {
 
      async function exitRoom() {
           try {
-               const res = await axios.get(`/api/student/${roomID}/exit`, {
-                    withCredentials: true
-               });
+               const res = await api.get(`/api/student/${roomID}/exit`);
 
                if (res.data.success) {
                     toast(res.data.message);

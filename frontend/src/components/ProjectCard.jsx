@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 
@@ -13,9 +13,7 @@ function ProjectCard({ project, isAdmin, roomID, isActive, onSelectProject }) {
 
   const isItUsersProject = async () => {
     try {
-      const res = await axios.get(`/api/student/${project._id}/isUserProject`, {
-        withCredentials: true
-      });
+      const res = await api.get(`/api/student/${project._id}/isUserProject`);
 
       if (res.status !== 200) throw new Error("Failed");
 

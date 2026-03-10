@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 
 function CreateRoom() {
      const navigate = useNavigate();
@@ -27,8 +27,8 @@ function CreateRoom() {
 
           try {
                setLoading(true)
-               const res = await axios.post(`/api/admin/createRoom`,
-                    form, { withCredentials: true }
+               const res = await api.post(`/api/admin/createRoom`,
+                    form
                );
 
                if (res.status === 200) {

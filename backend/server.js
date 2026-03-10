@@ -26,12 +26,16 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/student', userRouter);
-app.use('/api/projects', projectRouter)
+app.use('/api/projects', projectRouter);
 
 app.get('/', (req, res) => {
      res.send("Peer Review Server is Working Fine");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;

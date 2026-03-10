@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../api/axios';
 import React, { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -42,8 +42,8 @@ function Register() {
           try {
                setLoading(true);
 
-               const res = await axios.post(`/api/auth/register`,
-                    form, { withCredentials: true }
+               const res = await api.post(`/api/auth/register`,
+                    form
                );
 
                const data = res.data;

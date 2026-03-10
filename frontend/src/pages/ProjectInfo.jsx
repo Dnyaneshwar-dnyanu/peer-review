@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import EditProject from "../components/EditProject";
 import ConfirmModal from "../components/ConfirmModel";
-import axios from "axios";
+import api from "../api/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
@@ -25,9 +25,7 @@ function ProjectInfo() {
         try {
             setLoading(true);
 
-            const res = await axios.get(`/api/projects/${projectID}/getInfo`,
-                { withCredentials: true }
-            );
+            const res = await api.get(`/api/projects/${projectID}/getInfo`);
 
             if (res.status !== 200 || !res.data.project) {
                 navigate(`/admin/room/${roomID}`);
@@ -50,9 +48,8 @@ function ProjectInfo() {
         try {
             setLoading(true);
 
-            const res = await axios.put(`/api/projects/${project._id}/update`,
-                updatedData,
-                { withCredentials: true }
+            const res = await api.put(`/api/projects/${project._id}/update`,
+                updatedData
             );
 
             if (res.data.success) {
@@ -74,9 +71,7 @@ function ProjectInfo() {
         if (!project?._id) return;
 
         try {
-            const res = await axios.delete(`/api/projects/${project._id}/delete`,
-                { withCredentials: true }
-            );
+            const res = await api.delete(`/api/projects/${project._id}/delete`);
 
             setDeleteProject(false);
 

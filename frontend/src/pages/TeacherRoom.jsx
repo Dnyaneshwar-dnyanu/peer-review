@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { FaProjectDiagram, FaPlus, FaUsers } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import ProjectCard from "../components/ProjectCard";
@@ -32,9 +32,7 @@ function ClassroomPage() {
 
   let getRoomData = async () => {
     try {
-      const res = await axios.get(`/api/admin/getRoomData/${roomId}`, {
-        withCredentials: true
-      });
+      const res = await api.get(`/api/admin/getRoomData/${roomId}`);
 
       const data = res.data;
       setRoom(data.room);
@@ -54,9 +52,7 @@ function ClassroomPage() {
     try {
       setCloseRoomButton(true);
 
-      const res = await axios.get(`/api/admin/openRoom/${roomId}`, {
-        withCredentials: true
-      });
+      const res = await api.get(`/api/admin/openRoom/${roomId}`);
 
       if (res.status !== 200) throw new Error("Failed!");
 
@@ -76,9 +72,7 @@ function ClassroomPage() {
     try {
       setCloseRoomButton(true);
 
-      const res = await axios.get(`/api/admin/closeRoom/${roomId}`, {
-        withCredentials: true
-      });
+      const res = await api.get(`/api/admin/closeRoom/${roomId}`);
 
       if (res.status !== 200) throw new Error("Failed!");
 

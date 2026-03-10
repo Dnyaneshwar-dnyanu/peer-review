@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import { toast } from "react-toastify";
-import axios from "axios";
+import api from "../api/axios";
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
@@ -24,8 +24,8 @@ function Login() {
     try {
       setLoading(true);
 
-      const res = await axios.post(`/api/auth/login`,
-        form, { withCredentials: true }
+      const res = await api.post(`/api/auth/login`,
+        form
       );
 
       if (res.status !== 200) throw new Error("Failed");

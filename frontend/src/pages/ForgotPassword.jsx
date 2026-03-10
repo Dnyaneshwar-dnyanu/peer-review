@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { FaUser, FaLock } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../api/axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -29,8 +29,8 @@ function ForgotPassword() {
         try {
             setLoading(true);
 
-            const res = await axios.post(`/api/auth/updatePassword`,
-                form, { withCredentials: true }
+            const res = await api.post(`/api/auth/updatePassword`,
+                form
             );
 
             if (res.status !== 200) throw new Error("Failed");

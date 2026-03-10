@@ -4,7 +4,7 @@ import { IoMdAdd } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 import RoomCard from "../components/RoomCard";
 import { toast } from "react-toastify";
-import axios from "axios";
+import api from "../api/axios";
 import { IoMdMenu, IoMdClose } from "react-icons/io";
 import Loader from "../components/Loader";
 
@@ -23,9 +23,7 @@ function TeacherDashboard() {
           try {
                setLoading(true);
 
-               const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/auth/getData`, {
-                    withCredentials: true
-               });
+               const res = await api.get(`/api/auth/getData`);
 
                if (res.status !== 200) throw new Error("Failed");
                setUser(res.data.user);
@@ -56,9 +54,7 @@ function TeacherDashboard() {
           try {
                setLoading(true);
 
-               const res = await axios.get(`/api/auth/logoutUser`, {
-                    withCredentials: true
-               });
+               const res = await api.get(`/api/auth/logoutUser`);
      
                if (res.status !== 200) throw new Error("Failed");
      

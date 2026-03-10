@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import axios from 'axios';
+import api from '../api/axios';
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 
@@ -27,9 +27,7 @@ function AddProject({ onClose }) {
             return toast.error('This student is already added!');
         }
         
-        let res = await axios.post(`/api/auth/validateStudent`, { usn: memberUSN }, {
-            withCredentials: true
-        });
+        let res = await api.post(`/api/auth/validateStudent`, { usn: memberUSN });
         
         if (!res.data.success) {
             return toast.error(res.data.message);
@@ -62,8 +60,8 @@ function AddProject({ onClose }) {
         try {
             setDisableButton(true);
 
-            await axios.post(`/api/projects/add/${roomID}`,
-                { title: form.title, description: form.description, type: form.type, members }, { withCredentials: true }
+            await api.post(`/api/projects/add/${roomID}`,
+                { title: form.title, description: form.description, type: form.type, members }
             );
 
             toast.success('Project added successfully!');

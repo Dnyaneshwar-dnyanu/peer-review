@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { useRef } from "react";
 
 function EvaluateForm({ project, maxMarks }) {
@@ -27,8 +27,8 @@ function EvaluateForm({ project, maxMarks }) {
 
         try {
             setLoading(true);
-            const res = await axios.post(`/api/projects/addReview/${project._id}`,
-                form, { withCredentials: true }
+            const res = await api.post(`/api/projects/addReview/${project._id}`,
+                form
             );
 
             const data = res.data;
@@ -51,9 +51,7 @@ function EvaluateForm({ project, maxMarks }) {
 
     const getComments = async () => {
         try {
-            const res = await axios.get(`/api/projects/getComments/${project._id}`, {
-                withCredentials: true
-            });
+            const res = await api.get(`/api/projects/getComments/${project._id}`);
 
             if (res.status !== 200) throw new Error("Failed");
 
@@ -72,9 +70,7 @@ function EvaluateForm({ project, maxMarks }) {
 
     const isItUsersProject = async () => {
         try {
-            const res = await axios.get(`/api/student/${project._id}/isUserProject`, {
-                withCredentials: true
-            });
+            const res = await api.get(`/api/student/${project._id}/isUserProject`);
 
             if (res.status !== 200) throw new Error("Failed");
 

@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { toast } from "react-toastify";
 import Loader from "./Loader";
 
@@ -14,9 +14,7 @@ function ProtectedRoute({ children, allowedRoles }) {
 
      const checkAuth = async () => {
           try {
-               const res = await axios.get(`/api/auth/validateUser`, {
-                    withCredentials: true
-               });
+               const res = await api.get(`/api/auth/validateUser`);
 
                if (!res.data.auth) {
                     setUserRole(undefined);
