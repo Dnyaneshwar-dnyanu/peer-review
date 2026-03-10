@@ -32,10 +32,8 @@ app.get('/', (req, res) => {
      res.send("Peer Review Server is Working Fine");
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+     console.log(`Server running on http://localhost:${PORT}`);
+});
 
 module.exports = app;
