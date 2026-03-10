@@ -128,8 +128,8 @@ module.exports.deleteProject = async (req, res) => {
 
         const room = await roomModel.findOne({ projects: project._id });
 
-        if (room.status === 'OPEN') {
-            return res.send({ success: false, message: "Classroom is open, you can't delete now" });
+        if (room) {
+            return res.send({ success: false, message: "Project can't be deleted." });
         }
 
         let user = await userModel.findById({ _id: project.student });

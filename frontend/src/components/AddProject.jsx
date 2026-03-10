@@ -16,14 +16,14 @@ function AddProject({ onClose }) {
 
     const addMember = async () => {
         if (memberUSN.trim().length < 10) {
-            console.log(memberUSN.trim().length);
-
             return toast.error("Enter the details of member to add!");
         };
         
         const alreadyMember = members.some((member) => member.usn === memberUSN);
         
         if (alreadyMember) {
+            console.log(members);
+            
             return toast.error('This student is already added!');
         }
         
