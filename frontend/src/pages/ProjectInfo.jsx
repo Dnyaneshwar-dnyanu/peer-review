@@ -18,29 +18,29 @@ function ProjectInfo() {
     const [deleteProject, setDeleteProject] = useState(false);
 
     useEffect(() => {
-        getProjectInfo();
-    }, [projectID]);
+        const getProjectInfo = async () => {
+            try {
+                setLoading(true);
 
-    const getProjectInfo = async () => {
-        try {
-            setLoading(true);
+                const res = await api.get(`/api/projects/${projectID}/getInfo`);
 
-            const res = await api.get(`/api/projects/${projectID}/getInfo`);
+                if (res.status !== 200 || !res.data.project) {
+                    navigate(`/admin/room/${roomID}`);
+                }
 
-            if (res.status !== 200 || !res.data.project) {
+                setProject(res.data.project);
+
+            } catch {
+                toast.error("Failed to fetch project details")
                 navigate(`/admin/room/${roomID}`);
+
+            } finally {
+                setLoading(false);
             }
+        };
 
-            setProject(res.data.project);
-
-        } catch (err) {
-            toast.error("Failed to fetch project details")
-            navigate(`/admin/room/${roomID}`);
-
-        } finally {
-            setLoading(false);
-        }
-    };
+        getProjectInfo();
+    }, [projectID, roomID, navigate]);
 
     const handleEdit = async (updatedData) => {
         if (!project?._id) return;
@@ -53,13 +53,17 @@ function ProjectInfo() {
             );
 
             if (res.data.success) {
-                getProjectInfo();
+                // Re-fetch project info
+                const fetchInfo = async () => {
+                    const resInfo = await api.get(`/api/projects/${projectID}/getInfo`);
+                    setProject(resInfo.data.project);
+                }
+                fetchInfo();
                 setEdit(false);
                 toast.success(res.data.message);
             }
 
-        } catch (err) {
-            console.error(err);
+        } catch {
             toast.error("Something error occurred!");
 
         } finally {
@@ -77,14 +81,13 @@ function ProjectInfo() {
 
             if (res.data.success) {
                 toast.success(res.data.message);
-                getProjectInfo();
+                navigate(`/admin/room/${roomID}`);
 
             } else {
                 toast.error(res.data.message);
             }
 
-        } catch (err) {
-            console.error(err);
+        } catch {
             toast.error("Something error occurred!");
 
         } finally {

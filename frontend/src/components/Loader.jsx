@@ -1,4 +1,3 @@
-import React from 'react'
 import { IoReloadSharp } from 'react-icons/io5';
 
 function Loader() {

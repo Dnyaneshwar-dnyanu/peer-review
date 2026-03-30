@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const cookie = require('cookie');
 const { generateToken } = require('../utils/generateToken')
 const userModel = require('../models/User');
@@ -30,8 +30,8 @@ module.exports.registerUser = async (req, res) => {
                     let token = generateToken(user);
                     res.cookie("token", token, {
                          httpOnly: true,
-                         secure: true,
-                         sameSite: "none",
+                         secure: false, // Set to false for local HTTP
+                         sameSite: "lax",
                          maxAge: 24 * 60 * 60 * 1000
                     });
 
@@ -54,8 +54,8 @@ module.exports.loginUser = async (req, res) => {
                     let token = generateToken(user);
                     res.cookie("token", token, {
                          httpOnly: true,
-                         secure: true,
-                         sameSite: "none",
+                         secure: false, // Set to false for local HTTP
+                         sameSite: "lax",
                          maxAge: 24 * 60 * 60 * 1000
                     });
                     return res.send({ auth: true, user: user });

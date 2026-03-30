@@ -23,30 +23,30 @@ function ClassroomPage() {
   const [roomCode, setRoomCode] = useState("");
 
   useEffect(() => {
+    const getRoomData = async () => {
+      try {
+        const res = await api.get(`/api/admin/getRoomData/${roomId}`);
+
+        const data = res.data;
+        setRoom(data.room);
+        setProjects(data.projects);
+        setRoomCode(data.room.roomCode);
+
+      } catch (err) {
+        console.error(err);
+        toast.error("Something error occurred!");
+
+      } finally {
+        setLoading(false);
+      }
+    }
+
     getRoomData();
 
     let interval = setInterval(getRoomData, 3000);
 
     return () => clearInterval(interval);
-  }, []);
-
-  let getRoomData = async () => {
-    try {
-      const res = await api.get(`/api/admin/getRoomData/${roomId}`);
-
-      const data = res.data;
-      setRoom(data.room);
-      setProjects(data.projects);
-      setRoomCode(data.room.roomCode);
-
-    } catch (err) {
-      console.error(err);
-      toast.error("Something error occurred!");
-
-    } finally {
-      setLoading(false);
-    }
-  }
+  }, [roomId]);
 
   let openRoom = async () => {
     try {
@@ -57,7 +57,13 @@ function ClassroomPage() {
       if (res.status !== 200) throw new Error("Failed!");
 
       setRoomCode(res.data.code);
-      getRoomData();
+      // Trigger a refresh of room data
+      const refreshData = async () => {
+        const resData = await api.get(`/api/admin/getRoomData/${roomId}`);
+        setRoom(resData.data.room);
+        setProjects(resData.data.projects);
+      }
+      refreshData();
 
     } catch (err) {
       console.error(err);
@@ -77,7 +83,13 @@ function ClassroomPage() {
       if (res.status !== 200) throw new Error("Failed!");
 
       setRoomCode(res.data.code);
-      getRoomData();
+      // Trigger a refresh of room data
+      const refreshData = async () => {
+        const resData = await api.get(`/api/admin/getRoomData/${roomId}`);
+        setRoom(resData.data.room);
+        setProjects(resData.data.projects);
+      }
+      refreshData();
 
     } catch (err) {
       console.error(err);

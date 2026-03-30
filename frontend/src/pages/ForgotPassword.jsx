@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { IoArrowBackOutline } from 'react-icons/io5';
-import Loader from '../components/Loader';
 
 function ForgotPassword() {
     const navigate = useNavigate();

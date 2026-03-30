@@ -1,29 +1,29 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
+import { toast } from "react-toastify";
 
 function ProjectCard({ project, isAdmin, roomID, isActive, onSelectProject }) {
 
   const [viewType, setViewType] = useState(null);
 
   useEffect(() => {
+    const isItUsersProject = async () => {
+      try {
+        const res = await api.get(`/api/student/${project._id}/isUserProject`);
+
+        if (res.status !== 200) throw new Error("Failed");
+
+        setViewType(res.data.status ? "viewReview" : "addReview");
+
+      } catch (err) {
+        console.error(err);
+        toast.error("Something error occurred!");
+      }
+    }
     isItUsersProject();
   }, [project._id]);
-
-  const isItUsersProject = async () => {
-    try {
-      const res = await api.get(`/api/student/${project._id}/isUserProject`);
-
-      if (res.status !== 200) throw new Error("Failed");
-
-      setViewType(res.data.status ? "viewReview" : "addReview");
-
-    } catch (err) {
-      console.error(err);
-      toast.error("Something error occurred!");
-    }
-  }
 
   return (
     <div

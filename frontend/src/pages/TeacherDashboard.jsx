@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { FaHome, FaUserGraduate, FaTasks, FaSignOutAlt } from "react-icons/fa";
+import { FaHome, FaTasks, FaSignOutAlt } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 import RoomCard from "../components/RoomCard";

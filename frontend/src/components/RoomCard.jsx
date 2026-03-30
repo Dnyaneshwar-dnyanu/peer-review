@@ -4,11 +4,9 @@ import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
 import ConfirmModal from "./ConfirmModel";
 import api from "../api/axios";
-import Loader from "./Loader";
 
 function RoomCard({ Room, onUpdate }) {
      const navigate = useNavigate();
-     const [loading, setLoading] = useState(false);
      const [deleteRoom, setDeleteRoom] = useState(false);
 
      const handleDelete = async (RoomId) => {

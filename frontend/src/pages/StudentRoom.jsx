@@ -19,15 +19,7 @@ function StudentRoom() {
      const [showForm, setShowForm] = useState(false);
      const [selectedProject, setSelectedProject] = useState(null);
 
-     useEffect(() => {
-          getRoomData();
-
-          let interval = setInterval(getRoomData, 3000);
-
-          return () => clearInterval(interval);
-     }, []);
-
-     let getRoomData = async () => {
+     const refreshRoomData = async () => {
           try {
                const res = await api.get(`/api/admin/getRoomData/${roomID}`);
 
@@ -45,28 +37,40 @@ function StudentRoom() {
           } catch (err) {
                console.error(err);
                toast.error("Something error occurred!");
-
-          } finally {
-               setLoading(false);
           }
      }
 
-     async function exitRoom() {
-          try {
-               const res = await api.get(`/api/student/${roomID}/exit`);
+     useEffect(() => {
+          const getRoomData = async () => {
+               try {
+                    const res = await api.get(`/api/admin/getRoomData/${roomID}`);
 
-               if (res.data.success) {
-                    toast(res.data.message);
-                    navigate('/student/dashboard');
+                    const data = res.data;
 
-               } else {
-                    toast.error(res.data.message);
+                    if (data.room.status === 'CLOSED') {
+                         toast.info("Classroom Closed");
+                         navigate('/student/dashboard');
+
+                    } else {
+                         setRoom(data.room);
+                         setProjects(data.projects);
+                    }
+
+               } catch (err) {
+                    console.error(err);
+                    toast.error("Something error occurred!");
+
+               } finally {
+                    setLoading(false);
                }
-          } catch (err) {
-               console.error(err);
-               toast.error("Something error occurred");
           }
-     }
+
+          getRoomData();
+
+          let interval = setInterval(getRoomData, 3000);
+
+          return () => clearInterval(interval);
+     }, [roomID, navigate]);
 
      if (loading)
           return <Loader />
@@ -113,7 +117,7 @@ function StudentRoom() {
                               ${showForm ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'} `}>
                          <AddProject onClose={() => {
                               setShowForm(false);
-                              getRoomData();
+                              refreshRoomData();
                          }} />
                     </div>
 

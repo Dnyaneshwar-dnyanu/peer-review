@@ -1,7 +1,6 @@
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import api from "../api/axios";
-import { useRef } from "react";
 
 function EvaluateForm({ project, maxMarks }) {
     const [form, setForm] = useState({ marks: "", comment: "" });
@@ -11,6 +10,35 @@ function EvaluateForm({ project, maxMarks }) {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        const getComments = async () => {
+            try {
+                const res = await api.get(`/api/projects/getComments/${project._id}`);
+
+                if (res.status !== 200) throw new Error("Failed");
+
+                setReviews(res.data.reviews);
+                setMarks(res.data.avgMarks);
+
+            } catch (err) {
+                console.error(err);
+                toast.error("Something error occurred!");
+            }
+        }
+
+        const isItUsersProject = async () => {
+            try {
+                const res = await api.get(`/api/student/${project._id}/isUserProject`);
+
+                if (res.status !== 200) throw new Error("Failed");
+
+                setViewType(res.data.status ? "viewReview" : "addReview");
+
+            } catch (err) {
+                console.error(err);
+                toast.error("Something error occurred!");
+            }
+        }
+
         if (project) {
             getComments();
             isItUsersProject();
@@ -38,6 +66,12 @@ function EvaluateForm({ project, maxMarks }) {
                 toast.error(data.message);
             }
 
+            // Manually re-trigger comment fetch if needed or rely on interval
+            const getComments = async () => {
+                const resComm = await api.get(`/api/projects/getComments/${project._id}`);
+                setReviews(resComm.data.reviews);
+                setMarks(resComm.data.avgMarks);
+            }
             getComments();
             setForm({ marks: 0, comment: "" });
 
@@ -49,37 +83,8 @@ function EvaluateForm({ project, maxMarks }) {
         }
     }
 
-    const getComments = async () => {
-        try {
-            const res = await api.get(`/api/projects/getComments/${project._id}`);
-
-            if (res.status !== 200) throw new Error("Failed");
-
-            setReviews(res.data.reviews);
-            setMarks(res.data.avgMarks);
-
-        } catch (err) {
-            console.error(err);
-            toast.error("Something error occurred!");
-        }
-    }
-
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
-    }
-
-    const isItUsersProject = async () => {
-        try {
-            const res = await api.get(`/api/student/${project._id}/isUserProject`);
-
-            if (res.status !== 200) throw new Error("Failed");
-
-            setViewType(res.data.status ? "viewReview" : "addReview");
-
-        } catch (err) {
-            console.error(err);
-            toast.error("Something error occurred!");
-        }
     }
 
     if (!project) {
