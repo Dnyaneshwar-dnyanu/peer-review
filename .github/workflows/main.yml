@@ -12,8 +12,8 @@ permissions:
   packages: write
 
 jobs:
-  test:
-    name: Run Tests & Lint
+  test-backend:
+    name: Backend - Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,9 +23,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: |
-            backend/package.json
-            frontend/package.json
+          cache-dependency-path: backend/package.json
 
       - name: Backend - Install & Test
         run: |
@@ -35,16 +33,30 @@ jobs:
         env:
           NODE_ENV: test
 
-      - name: Frontend - Install, Lint & Test
+  test-frontend:
+    name: Frontend - Lint, Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package.json
+
+      - name: Frontend - Install, Lint, Test & Build
         run: |
           npm install
           npm run lint || true # Don't fail the build on lint warnings, only errors
           npm test
+          npm run build
         working-directory: frontend
 
-  build-and-push:
-    name: Build & Push Docker Images
-    needs: test
+  build-and-push-backend:
+    name: Backend - Build & Push Docker Image
+    needs: test-backend
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -71,9 +83,9 @@ jobs:
           tags: ${{ steps.meta-backend.outputs.tags }}
           labels: ${{ steps.meta-backend.outputs.labels }}
 
-  deploy:
-    name: Trigger Render Deployment
-    needs: build-and-push
+  deploy-backend:
+    name: Backend - Trigger Render Deployment
+    needs: build-and-push-backend
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:

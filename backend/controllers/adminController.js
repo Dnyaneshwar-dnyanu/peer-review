@@ -1,5 +1,6 @@
 const userModel = require('../models/User');
 const roomModel = require('../models/Room');
+const reviewModel = require('../models/Reviews');
 const { v4: uuidv4 } = require('uuid');
 
 module.exports.createClassroom = async (req, res) => {
