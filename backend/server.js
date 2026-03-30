@@ -10,7 +10,9 @@ const projectRouter = require('./routes/projectRouter');
 require('dotenv').config();
 const connectDB = require('./config/db');
 
-connectDB();
+if (process.env.NODE_ENV !== 'test') {
+    connectDB();
+}
 
 const PORT = process.env.PORT || 3000;
 
@@ -32,8 +34,10 @@ app.get('/', (req, res) => {
      res.send("Peer Review Server is Working Fine");
 });
 
-app.listen(PORT, () => {
-     console.log(`Server running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+         console.log(`Server running on http://localhost:${PORT}`);
+    });
+}
 
 module.exports = app;
