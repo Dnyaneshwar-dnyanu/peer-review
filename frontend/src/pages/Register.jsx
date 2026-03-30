@@ -49,6 +49,7 @@ function Register() {
                const data = res.data;
 
                if (data.auth) {
+                    localStorage.setItem("token", data.token);
                     if (data.user.role === 'student') {
                          navigate('/student/dashboard');
                     }

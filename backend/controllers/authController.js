@@ -35,7 +35,7 @@ module.exports.registerUser = async (req, res) => {
                          maxAge: 24 * 60 * 60 * 1000
                     });
 
-                    return res.send({ auth: true, user: user });
+                    return res.send({ auth: true, user: user, token: token });
                });
           });
           return;
@@ -58,7 +58,7 @@ module.exports.loginUser = async (req, res) => {
                          sameSite: "lax",
                          maxAge: 24 * 60 * 60 * 1000
                     });
-                    return res.send({ auth: true, user: user });
+                    return res.send({ auth: true, user: user, token: token });
                }
                return res.send({ auth: false, message: "Invalid password" });
           })
