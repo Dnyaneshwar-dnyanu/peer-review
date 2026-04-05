@@ -49,6 +49,7 @@ function EditProject({ project, onSave }) {
                 transition
               "
               placeholder="Enter project title"
+              autoFocus
             />
           </div>
 

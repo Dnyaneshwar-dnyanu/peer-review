@@ -10,7 +10,7 @@ module.exports.validateUser = async (req, res, next) => {
      }
 
      if (!token) {
-          return res.send({auth: false});
+          return res.status(401).json({ success: false, auth: false, message: "No token provided" });
      }
 
      try {
@@ -18,13 +18,13 @@ module.exports.validateUser = async (req, res, next) => {
           let user = await userModel.findOne({email: decoded.email }).select('-password');
           
           if (!user) {
-               return res.send({auth: false});
+               return res.status(401).json({ success: false, auth: false, message: "User not found" });
           }
 
           req.user = user;  
           next();
      } catch (err) {
           console.error("JWT Verification Error:", err.message);
-          return res.send({auth: false});
+          return res.status(401).json({ success: false, auth: false, message: "Invalid or expired token" });
      }
 }

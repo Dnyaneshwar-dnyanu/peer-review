@@ -46,23 +46,23 @@ function Home() {
       {/* ===== HERO SECTION ===== */}
       <section className="
         max-w-5xl mx-auto
-        px-6 py-24
+        px-6 py-16 md:py-24
         text-center
       ">
-        <h2 className="text-5xl font-extrabold leading-tight">
+        <h2 className="text-3xl md:text-5xl font-extrabold leading-tight">
           Simplifying Academic
           <span className="block text-indigo-400 mt-2">
             Peer Review Process
           </span>
         </h2>
 
-        <p className="mt-6 text-lg text-white/70 max-w-3xl mx-auto">
+        <p className="mt-6 text-base md:text-lg text-white/70 max-w-3xl mx-auto">
           A centralized platform where students can submit projects,
           peers and instructors can evaluate them, and feedback is
           managed transparently — all in one place.
         </p>
 
-        <div className="mt-10 flex justify-center gap-6">
+        <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4 md:gap-6">
           <Link
             to="/register"
             className="

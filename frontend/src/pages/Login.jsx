@@ -14,20 +14,25 @@ function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const login = async () => {
-
-    if (form.email.trim().length < 4 || form.password.trim().length < 4) {
-      return toast.error("Invalid email or password");
+  const validateForm = () => {
+    if (!form.email || !form.password) {
+      toast.error("Email and password are required");
+      return false;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+    return true;
+  };
+
+  const login = async () => {
+    if (!validateForm()) return;
 
     try {
       setLoading(true);
-
-      const res = await api.post(`/api/auth/login`,
-        form
-      );
-
-      if (res.status !== 200) throw new Error("Failed");
+      const res = await api.post(`/api/auth/login`, form);
 
       const data = res.data;
 
@@ -35,24 +40,15 @@ function Login() {
         localStorage.setItem("token", data.token);
         if (data.user.role === 'student') {
           navigate('/student/dashboard');
-        }
-        else if (data.user.role === 'admin') {
+        } else if (data.user.role === 'admin') {
           navigate('/admin/dashboard');
         }
-        else {
-          navigate('/login');
-        }
-        toast.success("logged in successfully!");
+        toast.success("Welcome back!");
       }
-      else {
-        toast.error(data.message);
-        setForm({ email: "", password: "" });
-      }
-
     } catch (err) {
-      console.error(err);
-      toast.error("Something error occurred!");
-
+      // Axios interceptor handles console noise, we handle the UI feedback
+      const message = err.response?.data?.message || "Login failed. Please check your connection.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -60,22 +56,27 @@ function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
-      {/* Animated Login Card */}
       <div className="
         w-full max-w-md p-10 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-2xl 
-        bg-white/10 transform transition duration-500 hover:scale-[1.02] hover:shadow-xl
+        bg-white/10 transform transition duration-500 hover:scale-[1.02]
       ">
+        {/* Logo or Icon */}
+        <div className="flex justify-center mb-6">
+          <div className="p-4 bg-indigo-500 rounded-full shadow-lg">
+            <FaUser className="text-white text-3xl" />
+          </div>
+        </div>
 
-        {/* Heading */}
+        {/* Title */}
         <h2 className="text-3xl font-bold text-white text-center mb-6">
           Welcome Back
         </h2>
         <p className="text-center text-white/80 mb-8">
-          Login to your Peer Review Account
+          Login to manage your reviews
         </p>
 
         {/* Form */}
-        <div className="flex flex-col gap-4 text-white">
+        <form onSubmit={(e) => { e.preventDefault(); login(); }} className="flex flex-col gap-4 text-white">
 
           {/* Email Input with Icon */}
           <div className="relative">
@@ -85,6 +86,7 @@ function Login() {
               name="email"
               value={form.email}
               onChange={handleChange}
+              required
               autoComplete="off"
               placeholder="Email"
               className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 
@@ -100,6 +102,7 @@ function Login() {
               name="password"
               value={form.password}
               onChange={handleChange}
+              required
               autoComplete="off"
               placeholder="Password"
               className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 
@@ -107,25 +110,25 @@ function Login() {
             />
           </div>
 
-          <Link to="/login/forgotpassword" className="text-end hover:underline">Forgot password?</Link>
+          <Link to="/login/forgotpassword" className="text-end hover:underline text-sm">Forgot password?</Link>
 
           {/* Login Button */}
           <button
-            onClick={login}
+            type="submit"
             disabled={loading}
             className={`w-full py-3 text-lg bg-white text-indigo-900 rounded-lg font-semibold 
                        hover:bg-gray-200 transition ${loading && "cursor-disabled"}`}
           >
-            {loading ? "Logging..." : "Login"}
+            {loading ? "Logging in..." : "Login"}
           </button>
-        </div>
+        </form>
 
         {/* Footer */}
         <p className="text-center text-white/80 mt-6">
           Don’t have an account?{" "}
-          <a href="/register" className="text-white font-semibold hover:underline">
+          <Link to="/register" className="text-white font-semibold hover:underline">
             Register
-          </a>
+          </Link>
         </p>
 
       </div>

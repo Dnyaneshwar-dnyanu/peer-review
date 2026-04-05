@@ -67,7 +67,7 @@ function StudentRoom() {
 
           getRoomData();
 
-          let interval = setInterval(getRoomData, 3000);
+          let interval = setInterval(getRoomData, 5000);
 
           return () => clearInterval(interval);
      }, [roomID, navigate]);

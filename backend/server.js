@@ -35,6 +35,12 @@ app.get('/', (req, res) => {
      res.send("Peer Review Server is Working Fine");
 });
 
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send({ success: false, message: "Something went wrong! Internal Server Error" });
+});
+
 if (process.env.NODE_ENV !== 'test') {
     app.listen(PORT, () => {
          console.log(`Server running on http://localhost:${PORT}`);

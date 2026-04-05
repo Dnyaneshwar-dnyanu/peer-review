@@ -1,6 +1,6 @@
 import api from '../api/axios';
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 function Register() {
@@ -16,39 +16,57 @@ function Register() {
           }
      }
 
-     function isValidEmail(email) {
-          const regex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,}/;
-          return regex.test(email);
-     }
+     const validateForm = () => {
+          const { name, usn, email, role, password } = form;
+          
+          if (!name || name.trim().length < 4) {
+               toast.error("Enter valid name");
+               return false;
+          }
 
-     function isValidUSN(usn) {
-          const regex = /^1MS\d{2}[A-Z]{2}\d{3}$/
-          return regex.test(usn);
-     }
+          if (!role) {
+               toast.error("Please select a role");
+               return false;
+          }
+
+          if (role === 'student') {
+               const usnRegex = /^1MS\d{2}[A-Z]{2}\d{3}$/;
+               if (!usnRegex.test(usn.trim().toUpperCase())) {
+                    toast.error("Please enter a valid USN (e.g., 1MS23CS063)");
+                    return false;
+               }
+          }
+
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+               toast.error("Please enter a valid email address");
+               return false;
+          }
+
+          if (!password || password.trim().length < 4) {
+               toast.error("Password must be at least 4 characters");
+               return false;
+          }
+
+          return true;
+     };
 
      const register = async () => {
+          if (!validateForm()) return;
 
-          form.usn = form.usn.toUpperCase();
-
-          if (form.name.trim().length < 4 ||
-               !isValidEmail(form.email) ||
-               form.role.trim().length === 0 ||
-               (form.role === 'student' && !isValidUSN(form.usn)) ||
-               form.password.trim().length < 4) {
-
-               return toast.error("Enter valid details");
-          }
+          const registrationData = {
+               ...form,
+               usn: form.role === 'student' ? form.usn.trim().toUpperCase() : undefined
+          };
 
           try {
                setLoading(true);
-
-               const res = await api.post(`/api/auth/register`,
-                    form
-               );
+               
+               const res = await api.post(`/api/auth/register`, registrationData);
 
                const data = res.data;
 
-               if (data.auth) {
+               if (data.success) {
                     localStorage.setItem("token", data.token);
                     if (data.user.role === 'student') {
                          navigate('/student/dashboard');
@@ -58,20 +76,16 @@ function Register() {
                     }
                     toast.success("Successfully Registered!");
                }
-               else {
-                    toast.error(data.message);
-               }
           } catch (err) {
-               console.error(err);
-               toast.error("Something error occurred!");
-
+               const message = err.response?.data?.message || "Registration failed. Please try again.";
+               toast.error(message);
           } finally {
                setLoading(false);
           }
      }
 
      return (
-          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4 py-10">
                <div className="bg-white/10 backdrop-blur-xl p-10 rounded-2xl shadow-2xl w-full max-w-md border border-white/20 transform transition duration-500 hover:scale-[1.02] hover:shadow-xl">
                     {/* Title */}
                     <h2 className="text-3xl font-bold text-white text-center mb-6">
@@ -81,13 +95,14 @@ function Register() {
                          Join the Peer Review Platform
                     </p>
 
-                    <div className="flex flex-col gap-4 text-white">
+                    <form onSubmit={(e) => { e.preventDefault(); register(); }} className="flex flex-col gap-4 text-white">
 
                          <input
                               type="text"
                               name="name"
                               value={form.name}
                               onChange={handleChange}
+                              required
                               autoComplete='off'
                               placeholder="Full Name"
                               className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
@@ -97,7 +112,7 @@ function Register() {
                               name="role"
                               value={form.role}
                               onChange={handleChange}
-                              autoComplete='off'
+                              required
                               className="w-full p-3 rounded-lg bg-white/20 border border-white/30 focus:bg-white/30 outline-none"
                          >
                               <option value="" disabled>Select your role</option>
@@ -123,6 +138,7 @@ function Register() {
                               name="email"
                               value={form.email}
                               onChange={handleChange}
+                              required
                               autoComplete='off'
                               placeholder="Email Address"
                               className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
@@ -133,31 +149,32 @@ function Register() {
                               name="password"
                               value={form.password}
                               onChange={handleChange}
+                              required
                               autoComplete='off'
                               placeholder="Password"
                               className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
                          />
 
                          <button
-                              onClick={register}
+                              type="submit"
                               disabled={loading}
                               className={`w-full py-3 mt-2 text-lg bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition ${loading && "cursor-disabled"}`}
                          >
                               { loading ? "Registering..." : "Register"}
                          </button>
 
-                    </div>
+                    </form>
 
                     {/* Footer */}
                     <p className="text-center text-white/80 mt-6">
                          Already have an account?{" "}
-                         <a href="/login" className="text-white font-semibold hover:underline">
+                         <Link to="/login" className="text-white font-semibold hover:underline">
                               Login
-                         </a>
+                         </Link>
                     </p>
                </div>
           </div>
      )
 }
 
-export default Register
+export default Register;

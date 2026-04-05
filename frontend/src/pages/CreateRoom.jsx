@@ -16,30 +16,27 @@ function CreateRoom() {
      const [loading, setLoading] = useState(false);
 
      const createRoom = async () => {
-          if (form.roomName.trim().length < 4 ||
-               form.semester.trim().length === 0 ||
-               form.section.trim().length === 0 ||
-               parseInt(form.maxMarks.trim()) < 0 ||
-               parseInt(form.maxMarks.trim()) > 100
-          ) {
-               return toast.error("Enter valid details");
+          if (!form.roomName || !form.semester || !form.section || !form.maxMarks) {
+               return toast.error("Please fill in all fields");
+          }
+
+          if (form.roomName.trim().length < 4) {
+               return toast.error("Room name must be at least 4 characters");
           }
 
           try {
-               setLoading(true)
-               const res = await api.post(`/api/admin/createRoom`,
-                    form
-               );
+               setLoading(true);
 
-               if (res.status === 200) {
-                    toast.success("Classroom created successfully!");
+               const res = await api.post(`/api/admin/createRoom`, form);
+
+               if (res.data.success) {
+                    toast.success("Classroom Created Successfully!");
                     navigate('/admin/dashboard');
                }
 
           } catch (err) {
-               console.error(err);
-               toast.error("Something error occurred!");
-
+               const message = err.response?.data?.message || "Failed to create classroom";
+               toast.error(message);
           } finally {
                setLoading(false);
           }
@@ -68,14 +65,16 @@ function CreateRoom() {
                          Set up a classroom for peer evaluation
                     </p>
 
-                    <div className="flex flex-col gap-5 text-white">
+                    <form onSubmit={(e) => { e.preventDefault(); createRoom(); }} className="flex flex-col gap-5 text-white">
 
                          <input
                               type="text"
                               name="roomName"
                               value={form.roomName}
                               onChange={handleChange}
+                              required
                               autoComplete="off"
+                              autoFocus
                               placeholder="Room Name (Ex: AI Lab, DBMS Section A)"
                               className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
                          />
@@ -84,6 +83,7 @@ function CreateRoom() {
                               name="semester"
                               value={form.semester}
                               onChange={handleChange}
+                              required
                               className="w-full p-3 rounded-lg bg-white/20 border border-white/30 focus:bg-white/30 outline-none"
                          >
                               <option value="" disabled>Select the semester</option>
@@ -101,6 +101,7 @@ function CreateRoom() {
                               name="section"
                               value={form.section}
                               onChange={handleChange}
+                              required
                               className="w-full p-3 rounded-lg bg-white/20 border border-white/30 focus:bg-white/30 outline-none"
                          >
                               <option value="" disabled>Select section</option>
@@ -116,6 +117,7 @@ function CreateRoom() {
                               name="maxMarks"
                               value={form.maxMarks}
                               onChange={handleChange}
+                              required
                               autoComplete="off"
                               placeholder="Maximum Marks"
                               className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 
@@ -123,14 +125,14 @@ function CreateRoom() {
                          />
 
                          <button 
-                              onClick={createRoom}
+                              type="submit"
                               disabled={loading}
                               className={`w-full py-3 mt-2 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition ${loading && "cursor-disabled"}`}
                          >
                               { loading ?  "Creating Classroom...": "Create Classroom" }
                          </button>
 
-                    </div>
+                    </form>
                </div>
           </div>
      );

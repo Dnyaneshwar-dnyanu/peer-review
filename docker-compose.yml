@@ -1,4 +1,9 @@
 services:
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - mongo-data:/data/db
+
   backend:
     build: ./backend
     restart: always
@@ -9,26 +14,9 @@ services:
       - PORT=3000
       - NODE_ENV=production
       - FRONTEND_URL=http://localhost
-      - JWT_KEY=my_super_secret_key_123  # <--- Added this
+      - JWT_KEY=${JWT_KEY}
     depends_on:
       - mongodb
-
-  frontend:
-    build: ./frontend
-    restart: always
-    ports:
-      - "80:80"
-    environment:
-      - VITE_REACT_APP_BACKEND_URL=/api
-    depends_on:
-      - backend
-
-  mongodb:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
 
 volumes:
   mongo-data:

@@ -107,33 +107,35 @@ function TeacherDashboard() {
                     </div>
                </div>
                {/* Main Content */}
-               <div className="flex-1 p-10 text-white relative">
+               <div className="flex-1 p-6 md:p-10 text-white relative">
 
-                    <IoMdMenu onClick={() => { setShowMenu(true) }} className="menuBar text-3xl " />
+                    <IoMdMenu onClick={() => { setShowMenu(true) }} className="menuBar text-3xl mb-10" />
 
-                    {/* Greeting Section */}
-                    <h1 className="text-4xl font-bold mb-2">Welcome back, {user && getDisplayName(user.name)}!</h1>
-                    <p className="text-white/80 mb-10">Here’s your dashboard overview</p>
+                    <div className="md:mt-0 mt-12">
+                         {/* Greeting Section */}
+                         <h1 className="text-3xl md:text-4xl font-bold mb-2">Welcome back, {user && getDisplayName(user.name)}!</h1>
+                         <p className="text-white/80 mb-10">Here’s your dashboard overview</p>
 
-                    {/* Stats Cards */}
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-10">
+                         {/* Stats Cards */}
+                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
 
-                         <div className="
-                              p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
-                              hover:scale-[1.03] transition transform shadow-lg
-                         ">
-                              <h3 className="text-xl font-semibold">Total Class Rooms</h3>
-                              <p className="text-4xl font-bold mt-4">{user && user.roomsCreated.length}</p>
-                         </div>
+                              <div className="
+                                   p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
+                                   hover:scale-[1.03] transition transform shadow-lg
+                              ">
+                                   <h3 className="text-xl font-semibold">Total Class Rooms</h3>
+                                   <p className="text-4xl font-bold mt-4">{user && user.roomsCreated.length}</p>
+                              </div>
 
-                         <div className="
-                              p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
-                              hover:scale-[1.03] transition transform shadow-lg cursor-pointer
-                         ">
-                              <Link to='/admin/createRoom'>
-                                   <h3 className="text-xl font-semibold">Create Classroom</h3>
-                                   <IoMdAdd className="text-4xl font-bold mt-4" />
-                              </Link>
+                              <div className="
+                                   p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
+                                   hover:scale-[1.03] transition transform shadow-lg cursor-pointer
+                              ">
+                                   <Link to='/admin/createRoom'>
+                                        <h3 className="text-xl font-semibold">Create Classroom</h3>
+                                        <IoMdAdd className="text-4xl font-bold mt-4" />
+                                   </Link>
+                              </div>
                          </div>
                     </div>
 

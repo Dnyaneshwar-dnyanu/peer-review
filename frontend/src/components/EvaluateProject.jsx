@@ -8,76 +8,73 @@ function EvaluateForm({ project, maxMarks }) {
     const [marks, setMarks] = useState(project.avgMarks);
     const [viewType, setViewType] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [reviewStatus, setReviewStatus] = useState(false);
+    const [isProjectValid, setIsProjectValid] = useState(true);
 
     useEffect(() => {
+        if (!project?._id || !isProjectValid) return;
+
         const getComments = async () => {
             try {
                 const res = await api.get(`/api/projects/getComments/${project._id}`);
-
-                if (res.status !== 200) throw new Error("Failed");
-
                 setReviews(res.data.reviews);
                 setMarks(res.data.avgMarks);
-
             } catch (err) {
-                console.error(err);
-                toast.error("Something error occurred!");
+                // Background polling - don't show toast unless it's a real failure
+                if (err.response && isProjectValid) {
+                    setIsProjectValid(false);
+                    toast.error("Project no longer available");
+                }
             }
         }
 
-        const isItUsersProject = async () => {
+        const init = async () => {
             try {
-                const res = await api.get(`/api/student/${project._id}/isUserProject`);
-
-                if (res.status !== 200) throw new Error("Failed");
-
-                setViewType(res.data.status ? "viewReview" : "addReview");
-
+                await Promise.all([
+                    getComments(),
+                    api.get(`/api/student/${project._id}/isUserProject`)
+                        .then(res => setViewType(res.data.status ? "viewReview" : "addReview")),
+                    api.get(`/api/projects/${project._id}/review-status`)
+                        .then(res => setReviewStatus(res.data.status))
+                ]);
             } catch (err) {
                 console.error(err);
-                toast.error("Something error occurred!");
             }
-        }
+        };
 
-        if (project) {
-            getComments();
-            isItUsersProject();
-        }
+        init();
 
-        let interval = setInterval(getComments, 3000);
+        let interval = setInterval(getComments, 5000); // 5s interval for production
 
         return () => clearInterval(interval);
-    }, [project]);
+
+    }, [project?._id, isProjectValid]);
 
     const addReview = async () => {
-        if (parseInt(form.marks) < 5)
-            return toast.error("Enter Valid Marks");
+        if (form.marks === "" || form.marks === undefined) {
+            return toast.error("Please enter marks");
+        }
+
+        if (parseInt(form.marks) < 0 || parseInt(form.marks) > maxMarks) {
+            return toast.error(`Marks must be between 0 and ${maxMarks}`);
+        }
 
         try {
             setLoading(true);
-            const res = await api.post(`/api/projects/addReview/${project._id}`,
-                form
-            );
+            const res = await api.post(`/api/projects/addReview/${project._id}`, form);
 
-            const data = res.data;
-            if (data.success) {
-                toast.success(data.message);
-            } else {
-                toast.error(data.message);
-            }
-
-            // Manually re-trigger comment fetch if needed or rely on interval
-            const getComments = async () => {
+            if (res.data.success) {
+                toast.success(res.data.message);
+                setReviewStatus(true);
+                // Refresh immediately
                 const resComm = await api.get(`/api/projects/getComments/${project._id}`);
                 setReviews(resComm.data.reviews);
                 setMarks(resComm.data.avgMarks);
+                setForm({ marks: "", comment: "" });
             }
-            getComments();
-            setForm({ marks: 0, comment: "" });
-
         } catch (err) {
-            console.error(err);
-            toast.error("Something error occurred!");
+            const message = err.response?.data?.message || "Failed to submit feedback";
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -87,7 +84,7 @@ function EvaluateForm({ project, maxMarks }) {
         setForm({ ...form, [e.target.name]: e.target.value });
     }
 
-    if (!project) {
+    if (!isProjectValid || !project?._id) {
         return (
             <div className="
                 h-full flex items-center justify-center
@@ -162,8 +159,8 @@ function EvaluateForm({ project, maxMarks }) {
                 )
             }
 
-            {viewType === "addReview" &&
-                <div className="mb-8 p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg">
+            {(viewType === "addReview" && !reviewStatus) &&
+                <form onSubmit={(e) => { e.preventDefault(); addReview(); }} className="mb-8 p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg">
 
                     {/* Marks Input */}
                     <div className="mb-4">
@@ -174,6 +171,8 @@ function EvaluateForm({ project, maxMarks }) {
                             type="number"
                             name="marks"
                             placeholder="Enter marks"
+                            autoFocus
+                            required
                             value={form.marks}
                             onChange={(e) => {
                                 const raw = e.target.value;
@@ -227,7 +226,7 @@ function EvaluateForm({ project, maxMarks }) {
 
                     {/* Submit Button */}
                     <button
-                        onClick={addReview}
+                        type="submit"
                         disabled={loading}
                         className={`
                             w-full py-3
@@ -240,7 +239,7 @@ function EvaluateForm({ project, maxMarks }) {
                     `}>
                         {loading ? "Submitting..." : "Submit Feedback"}
                     </button>
-                </div>
+                </form>
             }
 
 

@@ -17,12 +17,22 @@ function ProjectInfo() {
     const [edit, setEdit] = useState(false);
     const [deleteProject, setDeleteProject] = useState(false);
 
+    const [userRole, setUserRole] = useState(null);
+
     useEffect(() => {
         const getProjectInfo = async () => {
             try {
                 setLoading(true);
 
-                const res = await api.get(`/api/projects/${projectID}/getInfo`);
+                // Fetch user role for permission checks
+                const [authRes, res] = await Promise.all([
+                    await api.get('/api/auth/validateUser'),
+                    await api.get(`/api/projects/${projectID}/getInfo`)
+                ]);
+
+                if (authRes.data.auth) {
+                    setUserRole(authRes.data.user.role);
+                }
 
                 if (res.status !== 200 || !res.data.project) {
                     navigate(`/admin/room/${roomID}`);
@@ -30,8 +40,9 @@ function ProjectInfo() {
 
                 setProject(res.data.project);
 
-            } catch {
-                toast.error("Failed to fetch project details")
+            } catch (err) {
+                const message = err.response?.data?.message || "Failed to fetch project details";
+                toast.error(message);
                 navigate(`/admin/room/${roomID}`);
 
             } finally {
@@ -54,17 +65,15 @@ function ProjectInfo() {
 
             if (res.data.success) {
                 // Re-fetch project info
-                const fetchInfo = async () => {
-                    const resInfo = await api.get(`/api/projects/${projectID}/getInfo`);
-                    setProject(resInfo.data.project);
-                }
-                fetchInfo();
+                const resInfo = await api.get(`/api/projects/${projectID}/getInfo`);
+                setProject(resInfo.data.project);
                 setEdit(false);
                 toast.success(res.data.message);
             }
 
-        } catch {
-            toast.error("Something error occurred!");
+        } catch (err) {
+            const message = err.response?.data?.message || "Something error occurred!";
+            toast.error(message);
 
         } finally {
             setLoading(false);
@@ -87,8 +96,9 @@ function ProjectInfo() {
                 toast.error(res.data.message);
             }
 
-        } catch {
-            toast.error("Something error occurred!");
+        } catch (err) {
+            const message = err.response?.data?.message || "Something error occurred!";
+            toast.error(message);
 
         } finally {
             setDeleteProject(false);
@@ -101,51 +111,59 @@ function ProjectInfo() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black md:p-8 p-6">
 
-            <Link to={`/admin/room/${roomID}`} className="md:absolute relative md:mb-0 mb-3 flex items-center gap-2 py-2 px-3 border border-white/10 bg-white/65 font-semibold rounded-md">
+            <Link to={userRole === 'admin' ? `/admin/room/${roomID}` : `/student/room/${roomID}`} className="md:absolute relative sm:mb-0 mb-3 flex items-center gap-2 py-2 px-3 border border-white/10 bg-white/65 font-semibold rounded-md">
                 <IoArrowBackOutline className="text-zinc-600" /> Go Back
             </Link>
 
-            <div className="max-w-5xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl p-8 relative">
-                <div className="absolute top-5 right-5 flex justify-end gap-3 mb-6">
-                    <button
-                        onClick={() => setEdit(true)}
-                        className="
-                            px-3 py-2 rounded-lg
-                            bg-indigo-500/20 text-indigo-200
-                            border border-indigo-400/30
-                            hover:bg-indigo-500/30
-                            hover:scale-[1.03]
-                            transition-all duration-200
-                            font-semibold
-                            backdrop-blur-md
-                            "
-                    >
-                        ✏️ Edit
-                    </button>
+            <div className="max-w-5xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl p-6 md:p-8 relative">
 
-                    <button
-                        onClick={() => setDeleteProject(true)}
-                        className="
-                            px-3 py-2 rounded-lg
-                            bg-red-500/20 text-red-200
-                            border border-red-400/30
-                            hover:bg-red-500/30
-                            hover:scale-[1.03]
-                            transition-all duration-200
-                            font-semibold
-                            backdrop-blur-md
-                            "
-                    >
-                        🗑 Delete
-                    </button>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div className="flex-1">
+                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 capitalize">
+                            {project?.title}
+                        </h2>
+                    </div>
+
+                    {/* Permissions Check: Only Admin can Edit/Delete here */}
+                    {userRole === 'admin' && (
+                        <div className="flex flex-wrap gap-3">
+                            <button
+                                onClick={() => setEdit(true)}
+                                className="
+                                    px-4 py-2 rounded-lg
+                                    bg-indigo-500/20 text-indigo-200
+                                    border border-indigo-400/30
+                                    hover:bg-indigo-500/30
+                                    hover:scale-[1.03]
+                                    transition-all duration-200
+                                    font-semibold
+                                    backdrop-blur-md
+                                    "
+                            >
+                                ✏️ Edit
+                            </button>
+
+                            <button
+                                onClick={() => setDeleteProject(true)}
+                                className="
+                                    px-4 py-2 rounded-lg
+                                    bg-red-500/20 text-red-200
+                                    border border-red-400/30
+                                    hover:bg-red-500/30
+                                    hover:scale-[1.03]
+                                    transition-all duration-200
+                                    font-semibold
+                                    backdrop-blur-md
+                                    "
+                            >
+                                🗑 Delete
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="mb-8">
-                    <h2 className="text-4xl font-bold text-white mb-3">
-                        {project?.title}
-                    </h2>
-
-                    <p className="text-white/80 leading-relaxed max-w-3xl">
+                    <p className="text-white/80 leading-relaxed max-w-3xl text-lg">
                         {project?.description}
                     </p>
 
@@ -267,7 +285,7 @@ function ProjectInfo() {
                     isOpen={deleteProject}
                     title="Delete Project"
                     message="Are you sure you want to delete this project? This action cannot be undone."
-                    onConfirm={() => handleDelete()}
+                    onConfirm={() => { handleDelete(); setDeleteProject(false); }}
                     onCancel={() => setDeleteProject(false)}
                 />
             }

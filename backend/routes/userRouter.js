@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express();
 const { validateUser } = require('../middleware/validateUser');
-const { joinClassroom, isUserProject, exitClassroom } = require('../controllers/userController')
+const { joinClassroom, exitClassroom } = require('../controllers/classroomController');
+const { isUserProject } = require('../controllers/userController')
 
 router.get('/room/:roomCode/join', validateUser, joinClassroom);
 

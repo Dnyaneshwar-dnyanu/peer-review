@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { FaProjectDiagram, FaPlus, FaUsers } from "react-icons/fa";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import ProjectCard from "../components/ProjectCard";
 import EvaluateProject from "../components/EvaluateProject";
 import { IoArrowBackOutline } from "react-icons/io5";
@@ -13,6 +13,7 @@ import Loader from "../components/Loader";
 import { toast } from "react-toastify";
 
 function ClassroomPage() {
+  const navigate = useNavigate();
   let roomId = useParams().roomID;
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,7 +35,12 @@ function ClassroomPage() {
 
       } catch (err) {
         console.error(err);
-        toast.error("Something error occurred!");
+        if (err.response && err.response.status === 401) {
+          toast.error("Session expired. Logging out...");
+          navigate('/login');
+        } else {
+          toast.error("Something error occurred!");
+        }
 
       } finally {
         setLoading(false);
@@ -43,10 +49,26 @@ function ClassroomPage() {
 
     getRoomData();
 
-    let interval = setInterval(getRoomData, 3000);
+    // Auto-close room on tab/browser close
+    const handleTabClose = (e) => {
+      const url = `${window.location.origin}${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/admin/closeRoom/${roomId}`;
+      // Use fetch with keepalive and credentials
+      fetch(url, {
+        method: 'GET',
+        keepalive: true,
+        credentials: 'include'
+      });
+    };
 
-    return () => clearInterval(interval);
-  }, [roomId]);
+    window.addEventListener('beforeunload', handleTabClose);
+
+    let interval = setInterval(getRoomData, 5000);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('beforeunload', handleTabClose);
+    };
+  }, [roomId, navigate]);
 
   let openRoom = async () => {
     try {
@@ -212,7 +234,7 @@ function ClassroomPage() {
                 <MdGetApp className="text-3xl text-white mb-3" /> Evaluation File
               </h2>
               <a
-                href={`http://localhost:3000/admin/export/${roomId}`}
+                href={`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/admin/export/${roomId}`}
                 className="
                     inline-flex items-center gap-2
                     md:px-5 md:py-3 p-2 rounded-lg

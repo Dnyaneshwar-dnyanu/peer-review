@@ -29,7 +29,7 @@ function ForgotPassword() {
             setLoading(true);
 
             const res = await api.post(`/api/auth/updatePassword`,
-                form
+                {email: form.email, password: form.password}
             );
 
             if (res.status !== 200) throw new Error("Failed");
@@ -44,8 +44,8 @@ function ForgotPassword() {
             setForm({ email: "", password: "", confirmPassword: "" });
 
         } catch (err) {
-            console.error(err);
-            toast.error("Something error occurred!");
+            const errMessage = err.response?.data?.message || "Internal server error";
+            toast.error(errMessage);
 
         } finally {
             setLoading(false);
@@ -54,22 +54,23 @@ function ForgotPassword() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
-            <Link to='/Login' className="absolute left-3 top-3 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> <IoArrowBackOutline className="text-zinc-600" /> Back to Home</Link>
+            <Link to='/login' className="absolute left-4 top-4 md:left-8 md:top-8 flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md"> <IoArrowBackOutline className="text-zinc-600" /> Back to Login</Link>
             <div className="
                 w-full max-w-md p-10 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-xl 
                 bg-white/10 transform transition duration-500 hover:scale-[1.02] hover:shadow-xl
             ">
 
                 <h2 className="text-3xl font-bold text-white text-center mb-6">
-                    Welcome Back
+                    Reset Password
                 </h2>
                 <p className="text-center text-white/80 mb-8">
                     Change your password
                 </p>
 
-                <div className="flex flex-col gap-4 text-white">
+                <form onSubmit={(e) => { e.preventDefault(); changePassword(); }} className="flex flex-col gap-4 text-white">
+                    <div className='flex flex-col justify-center items-center gap-6'>
 
-                    <div className="relative">
+                    <div className="w-full relative">
                         <FaUser className="absolute left-3 top-3 text-white/70 text-lg" />
                         <input
                             type="email"
@@ -78,12 +79,14 @@ function ForgotPassword() {
                             onChange={handleChange}
                             autoComplete="off"
                             placeholder="Email"
+                            autoFocus
+                            required
                             className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 
                          focus:bg-white/30 outline-none"
                         />
                     </div>
 
-                    <div className="relative">
+                    <div className="w-full relative">
                         <FaLock className="absolute left-3 top-3 text-white/70 text-lg" />
                         <input
                             type="password"
@@ -92,12 +95,13 @@ function ForgotPassword() {
                             onChange={handleChange}
                             autoComplete="off"
                             placeholder="Password"
+                            required
                             className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 
                          focus:bg-white/30 outline-none"
                         />
                     </div>
 
-                    <div className="relative">
+                    <div className="w-full relative">
                         <FaLock className="absolute left-3 top-3 text-white/70 text-lg" />
                         <input
                             type="password"
@@ -106,13 +110,14 @@ function ForgotPassword() {
                             onChange={handleChange}
                             autoComplete="off"
                             placeholder="Confirm Password"
+                            required
                             className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 
                          focus:bg-white/30 outline-none"
                         />
                     </div>
 
                     <button
-                        onClick={changePassword}
+                        type="submit"
                         disabled={loading}
                         className={`w-full py-3 bg-white text-indigo-900 rounded-lg font-semibold 
                        hover:bg-gray-200 transition ${loading && "cursor-disabled"}`}
@@ -120,6 +125,7 @@ function ForgotPassword() {
                         { loading ? "Updating password..." :  "Update password" }
                     </button>
                 </div>
+                </form>
             </div>
         </div>
     )

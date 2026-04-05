@@ -55,7 +55,7 @@ function App() {
                     }
                     />
 
-                    <Route path='/student/room/:roomID' element={
+                    <Route path='/student/room/:roomCode/:roomID' element={
                          <ProtectedRoute allowedRoles={["student"]}>
                               <StudentRoom />
                          </ProtectedRoute>

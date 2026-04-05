@@ -8,7 +8,8 @@ import { IoEnterSharp } from "react-icons/io5";
 import { IoMdMenu, IoMdClose } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
 import ConfirmModal from "../components/ConfirmModel";
- import Loader from "../components/Loader";
+import Loader from "../components/Loader";
+import EnterRoom from "../components/EnterRoom";
 
 
 function StudentDashboard() {
@@ -17,7 +18,6 @@ function StudentDashboard() {
   const [user, setUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [roomCode, setRoomCode] = useState("");
   const [showMenu, setShowMenu] = useState(false);
   const [deleteProject, setDeleteProject] = useState(null);
 
@@ -56,29 +56,8 @@ function StudentDashboard() {
 
     } catch (err) {
       console.error(err);
-      toast.error("Something error occurred!");
-
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const enterRoom = async () => {
-    try {
-      setLoading(true);
-
-      const res = await api.get(`/api/student/room/${roomCode}/join`);
-
-      if (res.data.success) {
-        navigate(`/student/room/${res.data.roomID}`);
-
-      } else {
-        toast.error(res.data.message);
-      }
-
-    } catch (err) {
-      console.error(err);
-      toast.error("Something error occurred!");
+      const message = err.response?.data?.message || "Something error occurred!";
+      toast.error(message);
 
     } finally {
       setLoading(false);
@@ -93,18 +72,19 @@ function StudentDashboard() {
         toast.success(res.data.message);
       }
       else {
-        toast.error(res.data.message);
+        toast.error(res.data.message || "Failed to delete project");
       }
 
       getUser();
-      setDeleteProject(null);
 
     } catch (err) {
       console.error(err);
-      toast.error("Something error occurred!");
+      const message = err.response?.data?.message || "Something error occurred!";
+      toast.error(message);
 
     } finally {
       setLoading(false);
+      setDeleteProject(null);
     }
   }
 
@@ -116,44 +96,10 @@ function StudentDashboard() {
     <>
       <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black flex">
         {showModal && (
-          <div className="fixed z-10 inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-            <div className="bg-white/10 backdrop-blur-xl p-8 rounded-xl shadow-2xl border border-white/20 w-full max-w-md">
-
-              <h2 className="text-2xl font-bold text-white mb-4">
-                Enter Room Code
-              </h2>
-
-              <input
-                type="text"
-                placeholder="Room Code"
-                value={roomCode}
-                onChange={(e) => setRoomCode(e.target.value)}
-                className="
-                w-full p-3 rounded-lg bg-white/20 placeholder-white/70 
-                border border-white/30 focus:bg-white/30 outline-none
-              "
-              />
-
-              <div className="mt-6 flex gap-3 justify-end">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="py-2 px-4 rounded-lg bg-white/20 text-white border border-white/30 hover:bg-white/30"
-                >
-                  Cancel
-                </button>
-
-                <button onClick={enterRoom}
-                  className="py-2 px-4 rounded-lg bg-white text-indigo-900 font-semibold hover:bg-gray-200"
-                >
-                  Join Room
-                </button>
-              </div>
-
-            </div>
-          </div>
+          <EnterRoom toggleModal={setShowModal} />
         )}
 
-        <div className={`${showMenu ? "showMenu z-10" : "sidebar"} w-64 p-6 bg-white/10 backdrop-blur-xl border-r border-white/20`}>
+        <div className={`${showMenu ? "showMenu z-10" : "sidebar"} w-64 p-6 bg-white/10 backdrop-blur-xl border-r border-white/20 `}>
           <h1 className="text-3xl font-bold tracking-wide text-white mb-20">
             Peer<span className="text-indigo-400">Review</span>
           </h1>
@@ -182,28 +128,31 @@ function StudentDashboard() {
           </div>
         </div>
 
-        <div className="flex-1 p-10 text-white relative">
+        <div className="flex-1 p-6 md:p-10 text-white relative">
           {/* Menu */}
-          <IoMdMenu onClick={() => { setShowMenu(true) }} className="menuBar text-3xl " />
-          <h1 className="text-4xl font-bold mb-2">Welcome back, {user.name.split(' ')[0]}!</h1>
-          <p className="text-white/80 mb-10">Here’s your dashboard overview</p>
+          <IoMdMenu onClick={() => { setShowMenu(true) }} className="menuBar text-3xl mb-10" />
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-10">
-            <div className="
-            p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
-            hover:scale-[1.03] transition transform shadow-lg
-          ">
-              <h3 className="text-xl font-semibold">Total Projects</h3>
-              <p className="text-4xl font-bold mt-4">{user.projects.length}</p>
-            </div>
-            <div
-              onClick={() => setShowModal(true)}
-              className="
+          <div className="md:mt-0 mt-12">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">Welcome back, {user.name.split(' ')[0]}!</h1>
+            <p className="text-white/80 mb-10">Here’s your dashboard overview</p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
+              <div className="
               p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
-              hover:scale-[1.03] transition transform shadow-lg relative
-          ">
-              <h3 className="text-xl font-semibold">Enter a Room</h3>
-              <IoEnterSharp className="text-4xl font-bold mt-4" />
+              hover:scale-[1.03] transition transform shadow-lg
+            ">
+                <h3 className="text-xl font-semibold">Total Projects</h3>
+                <p className="text-4xl font-bold mt-4">{user.projects.length}</p>
+              </div>
+              <div
+                onClick={() => setShowModal(true)}
+                className="
+                p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 
+                hover:scale-[1.03] transition transform shadow-lg relative cursor-pointer
+            ">
+                <h3 className="text-xl font-semibold">Enter a Room</h3>
+                <IoEnterSharp className="text-4xl font-bold mt-4" />
+              </div>
             </div>
           </div>
 
