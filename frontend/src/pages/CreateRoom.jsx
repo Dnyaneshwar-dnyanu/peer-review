@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { IoArrowBackOutline } from "react-icons/io5";
+import { FaChalkboard, FaLayerGroup, FaUsers, FaHashtag } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
 
@@ -65,71 +66,106 @@ function CreateRoom() {
                          Set up a classroom for peer evaluation
                     </p>
 
+
+
                     <form onSubmit={(e) => { e.preventDefault(); createRoom(); }} className="flex flex-col gap-5 text-white">
 
-                         <input
-                              type="text"
-                              name="roomName"
-                              value={form.roomName}
-                              onChange={handleChange}
-                              required
-                              autoComplete="off"
-                              autoFocus
-                              placeholder="Room Name (Ex: AI Lab, DBMS Section A)"
-                              className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
-                         />
+                         {/* Room Name */}
+                         <div className="relative">
+                              <FaChalkboard className="absolute left-3 top-3 text-white/70 text-lg" />
+                              <input
+                                   type="text"
+                                   name="roomName"
+                                   value={form.roomName}
+                                   onChange={handleChange}
+                                   required
+                                   autoComplete="off"
+                                   autoFocus
+                                   placeholder="Room Name (Ex: AI Lab, DBMS Section A)"
+                                   className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
+                              />
+                         </div>
 
-                         <select
-                              name="semester"
-                              value={form.semester}
-                              onChange={handleChange}
-                              required
-                              className="w-full p-3 rounded-lg bg-white/20 border border-white/30 focus:bg-white/30 outline-none"
-                         >
-                              <option value="" disabled>Select the semester</option>
-                              <option value="I" className="text-black">I</option>
-                              <option value="II" className="text-black">II</option>
-                              <option value="III" className="text-black">III</option>
-                              <option value="IV" className="text-black">IV</option>
-                              <option value="V" className="text-black">V</option>
-                              <option value="VI" className="text-black">VI</option>
-                              <option value="VII" className="text-black">VII</option>
-                              <option value="VIII" className="text-black">VIII</option>
-                         </select>
+                         {/* Semester */}
+                         <div className="relative">
+                              <FaLayerGroup className="absolute left-3 top-3 text-white/70 text-lg" />
+                              <select
+                                   name="semester"
+                                   value={form.semester}
+                                   onChange={handleChange}
+                                   required
+                                   className="w-full p-3 pl-10 rounded-lg bg-white/20 border border-white/30 focus:bg-white/30 outline-none text-white"
+                              >
+                                   <option value="" disabled className="text-black">Select the semester</option>
+                                   <option value="I" className="text-black">I</option>
+                                   <option value="II" className="text-black">II</option>
+                                   <option value="III" className="text-black">III</option>
+                                   <option value="IV" className="text-black">IV</option>
+                                   <option value="V" className="text-black">V</option>
+                                   <option value="VI" className="text-black">VI</option>
+                                   <option value="VII" className="text-black">VII</option>
+                                   <option value="VIII" className="text-black">VIII</option>
+                              </select>
+                         </div>
 
-                         <select
-                              name="section"
-                              value={form.section}
-                              onChange={handleChange}
-                              required
-                              className="w-full p-3 rounded-lg bg-white/20 border border-white/30 focus:bg-white/30 outline-none"
-                         >
-                              <option value="" disabled>Select section</option>
-                              <option value="A" className="text-black">A</option>
-                              <option value="B" className="text-black">B</option>
-                              <option value="C" className="text-black">C</option>
-                              <option value="D" className="text-black">D</option>
-                              <option value="E" className="text-black">E</option>
-                         </select>
+                         {/* Section */}
+                         <div className="relative">
+                              <FaUsers className="absolute left-3 top-3 text-white/70 text-lg" />
+                              <select
+                                   name="section"
+                                   value={form.section}
+                                   onChange={handleChange}
+                                   required
+                                   className="w-full p-3 pl-10 rounded-lg bg-white/20 border border-white/30 focus:bg-white/30 outline-none text-white"
+                              >
+                                   <option value="" disabled className="text-black">Select section</option>
+                                   <option value="A" className="text-black">A</option>
+                                   <option value="B" className="text-black">B</option>
+                                   <option value="C" className="text-black">C</option>
+                                   <option value="D" className="text-black">D</option>
+                                   <option value="E" className="text-black">E</option>
+                              </select>
+                         </div>
 
-                         <input
-                              type="number"
-                              name="maxMarks"
-                              value={form.maxMarks}
-                              onChange={handleChange}
-                              required
-                              autoComplete="off"
-                              placeholder="Maximum Marks"
-                              className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 
-                       border border-white/30 focus:bg-white/30 outline-none"
-                         />
+                         {/* Max Marks */}
+                         <div className="relative">
+                              <FaHashtag className="absolute left-3 top-3 text-white/70 text-lg" />
+                              <input
+                                   type="number"
+                                   name="maxMarks"
+                                   value={form.maxMarks}
+                                   required
+                                   autoComplete="off"
+                                   placeholder="Maximum Marks"
+                                   onChange={(e) => {
+                                        const raw = e.target.value;
 
-                         <button 
+                                        if (raw === "") {
+                                             setForm({ ...form, marks: "" });
+                                             return;
+                                        }
+
+                                        const numeric = Number(raw);
+
+                                        if (isNaN(numeric)) return;
+
+                                        const value = Math.min(100, Math.max(0, numeric));
+
+                                        setForm({ ...form, maxMarks: value });
+                                   }}
+                                   className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 
+                 border border-white/30 focus:bg-white/30 outline-none"
+                              />
+                         </div>
+
+                         {/* Button */}
+                         <button
                               type="submit"
                               disabled={loading}
-                              className={`w-full py-3 mt-2 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition ${loading && "cursor-disabled"}`}
+                              className={`w-full py-3 mt-2 bg-white text-indigo-900 rounded-lg font-semibold 
+               hover:bg-gray-200 transition ${loading && "cursor-disabled"}`}
                          >
-                              { loading ?  "Creating Classroom...": "Create Classroom" }
+                              {loading ? "Creating Classroom..." : "Create Classroom"}
                          </button>
 
                     </form>

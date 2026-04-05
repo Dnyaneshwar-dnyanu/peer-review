@@ -1,6 +1,7 @@
 import api from '../api/axios';
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom';
+import { FaUser, FaIdCard, FaEnvelope, FaLock  } from "react-icons/fa";
 import { toast } from 'react-toastify';
 
 function Register() {
@@ -18,7 +19,7 @@ function Register() {
 
      const validateForm = () => {
           const { name, usn, email, role, password } = form;
-          
+
           if (!name || name.trim().length < 4) {
                toast.error("Enter valid name");
                return false;
@@ -61,7 +62,7 @@ function Register() {
 
           try {
                setLoading(true);
-               
+
                const res = await api.post(`/api/auth/register`, registrationData);
 
                const data = res.data;
@@ -97,70 +98,95 @@ function Register() {
 
                     <form onSubmit={(e) => { e.preventDefault(); register(); }} className="flex flex-col gap-4 text-white">
 
-                         <input
-                              type="text"
-                              name="name"
-                              value={form.name}
-                              onChange={handleChange}
-                              required
-                              autoComplete='off'
-                              placeholder="Full Name"
-                              className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
-                         />
-
-                         <select
-                              name="role"
-                              value={form.role}
-                              onChange={handleChange}
-                              required
-                              className="w-full p-3 rounded-lg bg-white/20 border border-white/30 focus:bg-white/30 outline-none"
-                         >
-                              <option value="" disabled>Select your role</option>
-                              <option value="student" className="text-black">Student</option>
-                              <option value="admin" className="text-black">Teacher</option>
-                         </select>
-
-                         {
-                              userRole === 'student' &&
+                         {/* Full Name */}
+                         <div className="relative">
+                              <FaUser className="absolute left-3 top-3 text-white/70 text-lg" />
                               <input
                                    type="text"
-                                   name="usn"
-                                   value={form.usn}
+                                   name="name"
+                                   value={form.name}
                                    onChange={handleChange}
-                                   autoComplete='off'
-                                   placeholder="USN ( Ex: 1MS23CS063 )"
-                                   className="w-full p-3 uppercase rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
+                                   required
+                                   autoComplete="off"
+                                   placeholder="Full Name"
+                                   className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 
+                 focus:bg-white/30 outline-none"
                               />
-                         }
+                         </div>
 
-                         <input
-                              type="email"
-                              name="email"
-                              value={form.email}
-                              onChange={handleChange}
-                              required
-                              autoComplete='off'
-                              placeholder="Email Address"
-                              className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
-                         />
+                         {/* Role */}
+                         <div className="relative">
+                              <select
+                                   name="role"
+                                   value={form.role}
+                                   onChange={handleChange}
+                                   required
+                                   className="w-full p-3 rounded-lg bg-white/20 border border-white/30 
+                 focus:bg-white/30 outline-none text-white"
+                              >
+                                   <option value="" disabled className="text-black">Select your role</option>
+                                   <option value="student" className="text-black">Student</option>
+                                   <option value="admin" className="text-black">Teacher</option>
+                              </select>
+                         </div>
 
-                         <input
-                              type="password"
-                              name="password"
-                              value={form.password}
-                              onChange={handleChange}
-                              required
-                              autoComplete='off'
-                              placeholder="Password"
-                              className="w-full p-3 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 focus:bg-white/30 outline-none"
-                         />
+                         {/* USN (only student) */}
+                         {userRole === 'student' && (
+                              <div className="relative">
+                                   <FaIdCard className="absolute left-3 top-3 text-white/70 text-lg" />
+                                   <input
+                                        type="text"
+                                        name="usn"
+                                        value={form.usn}
+                                        onChange={handleChange}
+                                        autoComplete="off"
+                                        placeholder="USN (Ex: 1MS23CS063)"
+                                        className="w-full p-3 pl-10 uppercase rounded-lg bg-white/20 placeholder-white/70 border border-white/30 
+                   focus:bg-white/30 outline-none"
+                                   />
+                              </div>
+                         )}
 
+                         {/* Email */}
+                         <div className="relative">
+                              <FaEnvelope className="absolute left-3 top-3 text-white/70 text-lg" />
+                              <input
+                                   type="email"
+                                   name="email"
+                                   value={form.email}
+                                   onChange={handleChange}
+                                   required
+                                   autoComplete="off"
+                                   placeholder="Email"
+                                   className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 
+                 focus:bg-white/30 outline-none"
+                              />
+                         </div>
+
+                         {/* Password */}
+                         <div className="relative">
+                              <FaLock className="absolute left-3 top-3 text-white/70 text-lg" />
+                              <input
+                                   type="password"
+                                   name="password"
+                                   value={form.password}
+                                   onChange={handleChange}
+                                   required
+                                   autoComplete="off"
+                                   placeholder="Password"
+                                   className="w-full p-3 pl-10 rounded-lg bg-white/20 placeholder-white/70 border border-white/30 
+                 focus:bg-white/30 outline-none"
+                              />
+                         </div>
+
+                         {/* Button */}
                          <button
                               type="submit"
                               disabled={loading}
-                              className={`w-full py-3 mt-2 text-lg bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition ${loading && "cursor-disabled"}`}
+                              className={`w-full py-3 text-lg bg-white text-indigo-900 rounded-lg font-semibold 
+               hover:bg-gray-200 transition ${loading && "cursor-disabled"}`}
                          >
-                              { loading ? "Registering..." : "Register"}
+                              {loading ? "Registering..." : "Register"}
                          </button>
 
                     </form>
