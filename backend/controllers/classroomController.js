@@ -3,6 +3,7 @@ const roomModel = require('../models/Room');
 const reviewModel = require('../models/Reviews');
 const projectModel = require('../models/Projects');
 const { v4: uuidv4 } = require('uuid');
+const ExcelJS = require("exceljs");
 
 // --- Admin Services ---
 
@@ -103,7 +104,7 @@ module.exports.deleteClassroom = async (req, res) => {
     }
 }
 
-module.exports.exportEvalutionToCSV = async (req, res) => {
+module.exports.exportEvalutionToExcel = async (req, res) => {
     try {
         let room = await roomModel.findOne({ _id: req.params.roomID })
             .populate({
@@ -114,27 +115,134 @@ module.exports.exportEvalutionToCSV = async (req, res) => {
                 }
             });
 
-        if (!room) return res.status(404).json({ success: false, message: 'Room not found' });
+        if (!room) {
+            return res.status(404).json({ success: false, message: 'Room not found' });
+        }
 
-        let csv = "Student Name, USN, Project Title, Marks\n";
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Guide Allotment');
+
+        // 🔹 TITLE (merged)
+        worksheet.mergeCells('A1:E1');
+        worksheet.getCell('A1').value = `${room.roomName} Projects Evaluation (Sem: ${room.semester}, Sec: ${room.section})`;
+        worksheet.getCell('A1').font = { bold: true, size: 16 };
+        worksheet.getCell('A1').alignment = { horizontal: 'center' };
+
+        // 🔹 HEADER
+        const header = ["SI. No.", "USN", "Name of the Students", "Project Title", "Marks"];
+        const headerRow = worksheet.addRow(header);
+
+        headerRow.font = { bold: true };
+        headerRow.alignment = { horizontal: 'center' };
+
+        headerRow.eachCell(cell => {
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
+
+        let rowIndex = 3;
+        let serialNo = 1;
 
         room.projects.forEach(project => {
-            csv += `"${project.student.name}", ${project.student.usn}, ${project.title}, ${project.avgMarks}\n`;
-        })
 
-        res.setHeader("Content-Type", "text/csv");
+            const startRow = rowIndex;
+
+            if (project.type === 'group') {
+
+                const students = [
+                    {
+                        name: project.student?.name,
+                        usn: project.student?.usn
+                    },
+                    ...(project.members || [])
+                ];
+
+                students.forEach((stu, i) => {
+                    const row = worksheet.addRow([
+                        i === 0 ? serialNo : "",
+                        stu.usn || "N/A",
+                        stu.name || "N/A",
+                        i === 0 ? project.title : "",
+                        i === 0 ? project.avgMarks : ""
+                    ]);
+
+                    row.eachCell(cell => {
+                        cell.border = {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        };
+                    });
+
+                    rowIndex++;
+                });
+
+                worksheet.mergeCells(`A${startRow}:A${rowIndex - 1}`);
+                worksheet.mergeCells(`D${startRow}:D${rowIndex - 1}`);
+                worksheet.mergeCells(`E${startRow}:E${rowIndex - 1}`);
+
+                serialNo++;
+            }
+
+            else {
+                const row = worksheet.addRow([
+                    serialNo,
+                    project.student?.usn || "N/A",
+                    project.student?.name || "N/A",
+                    project.title,
+                    project.avgMarks
+                ]);
+
+                row.eachCell(cell => {
+                    cell.border = {
+                        top: { style: 'thin' },
+                        left: { style: 'thin' },
+                        bottom: { style: 'thin' },
+                        right: { style: 'thin' }
+                    };
+                });
+
+                rowIndex++;
+                serialNo++;
+            }
+        });
+
+        // 🔹 Column width
+        worksheet.columns = [
+            { width: 7 },
+            { width: 15 },
+            { width: 30 },
+            { width: 30 },
+            { width: 10 }
+        ];
+
+        worksheet.columns[0].alignment = { horizontal: 'center'};
+        worksheet.columns[4].alignment = { horizontal: 'center'};
+
+        // 🔹 Response
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+
         res.setHeader(
             "Content-Disposition",
-            `attachment; filename=${room.roomName}_${room.semester}_${room.section}.csv`
-        )
+            `attachment; filename=${room.roomName}_${room.semester}_${room.section}.xlsx`
+        );
 
-        res.status(200).send(csv)
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Failed to download file' });
     }
-    catch (err) {
-        console.error("Unexpected Export CSV Error:", err);
-        res.status(500).json({ success: false, message: 'Failed to download the file' });
-    }
-}
+};
 
 // --- Student Services ---
 

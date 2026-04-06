@@ -122,6 +122,47 @@ function ClassroomPage() {
     }
   }
 
+  let downloadExcel = async () => {
+    try {
+      const res = await api.get(`/api/admin/export/${roomId}`, {
+        responseType: 'blob',
+        withCredentials: true
+      });
+
+      // 🔥 Create download
+      const blob = new Blob([res.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      });
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+
+      // optional: dynamic filename from backend
+      const contentDisposition = res.headers['content-disposition'];
+      let fileName = "evaluation.xlsx";
+
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?(.+)"?/);
+        if (match) fileName = match[1];
+      }
+
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+
+      toast.success("File downloaded successfully");
+
+    } catch (err) {
+      const message = err.response?.data?.message || "Download failed. Please try again.";
+      toast.error(message);
+    }
+  };
+
   if (loading)
     return <Loader />
 
@@ -165,18 +206,18 @@ function ClassroomPage() {
             <div className="mt-5">
               {
                 room && room.status === "OPEN" ?
-                  <button 
-                    onClick={closeRoom} 
+                  <button
+                    onClick={closeRoom}
                     disabled={closeRoomButton}
                     className="px-5 py-2 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 cursor-pointer">
-                    {closeRoomButton ? "Clossing Classroom..." : "Close Classroom" }
+                    {closeRoomButton ? "Clossing Classroom..." : "Close Classroom"}
                   </button>
                   :
-                  <button 
-                    onClick={openRoom} 
+                  <button
+                    onClick={openRoom}
                     disabled={closeRoomButton}
                     className="px-5 py-2 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 hover:scale-[1.03] cursor-pointer">
-                      {closeRoomButton ? "Opening Classroom..." : "Open Classroom" }
+                    {closeRoomButton ? "Opening Classroom..." : "Open Classroom"}
                   </button>
               }
             </div>
@@ -233,8 +274,8 @@ function ClassroomPage() {
               <h2 className="text-xl text-white font-semibold flex gap-3">
                 <MdGetApp className="text-3xl text-white mb-3" /> Evaluation File
               </h2>
-              <a
-                href={`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/admin/export/${roomId}`}
+              <button
+                onClick={downloadExcel}
                 className="
                     inline-flex items-center gap-2
                     md:px-5 md:py-3 p-2 rounded-lg
@@ -247,8 +288,8 @@ function ClassroomPage() {
                     "
               >
                 <span>📄</span>
-                Get CSV File
-              </a>
+                Get Excel File
+              </button>
             </div>
           </div>
         </div>

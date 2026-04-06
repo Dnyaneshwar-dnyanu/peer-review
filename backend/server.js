@@ -4,7 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const authRouter = require('./routes/authRouter');
-const adminRouter = require('./routes/adminRouter');
+const classroomRouter = require('./routes/classroomRouter');
 const userRouter = require('./routes/userRouter');
 const projectRouter = require('./routes/projectRouter');
 require('dotenv').config();
@@ -17,22 +17,23 @@ if (process.env.NODE_ENV !== 'test') {
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
-     origin: process.env.FRONTEND_URL,
-     methods: ["GET", "POST", "PUT", "DELETE"],
-     allowedHeaders: ["Content-Type", "Authorization"],
-     credentials: true
+    origin: process.env.FRONTEND_URL,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+    exposedHeaders: ["Content-Disposition"]
 }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
-app.use('/api/admin', adminRouter);
+app.use('/api/admin', classroomRouter);
 app.use('/api/student', userRouter);
 app.use('/api/projects', projectRouter);
 
 app.get('/', (req, res) => {
-     res.send("Peer Review Server is Working Fine");
+    res.send("Peer Review Server is Working Fine");
 });
 
 // Global Error Handler
@@ -43,7 +44,7 @@ app.use((err, req, res, next) => {
 
 if (process.env.NODE_ENV !== 'test') {
     app.listen(PORT, () => {
-         console.log(`Server running on http://localhost:${PORT}`);
+        console.log(`Server running on http://localhost:${PORT}`);
     });
 }
 
