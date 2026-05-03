@@ -1,23 +1,35 @@
 const mongoose = require('mongoose');
 
 const roomSchema = mongoose.Schema({
-     roomName: String,
+     roomName: {
+          type: String,
+          required: true,
+          trim: true
+     },
      semester: String,
      section: String,
      maxMarks: Number,
      createdBy: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User'
+          ref: 'User',
+          index: true
      },
      createdAt: {
           type: Date,
-          default: Date.now
+          default: Date.now,
+          index: true
      },
-     roomCode: String,
+     roomCode: {
+          type: String,
+          index: {
+               sparse: true // Only index if present (since it's cleared when room closes)
+          }
+     },
      status: {
           type: String,
           enum: ['OPEN', 'CLOSED'],
-          default: 'CLOSED'
+          default: 'CLOSED',
+          index: true
      },
      participants: [
           {

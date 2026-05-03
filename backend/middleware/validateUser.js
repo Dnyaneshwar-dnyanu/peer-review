@@ -1,13 +1,9 @@
 const userModel = require('../models/User');
 const jwt = require('jsonwebtoken');
+const logger = require('../utils/logger');
 
 module.exports.validateUser = async (req, res, next) => {
      let token = req.cookies.token;
-
-     // Also check Authorization header (Bearer token)
-     if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-          token = req.headers.authorization.split(' ')[1];
-     }
 
      if (!token) {
           return res.status(401).json({ success: false, auth: false, message: "No token provided" });
@@ -24,7 +20,7 @@ module.exports.validateUser = async (req, res, next) => {
           req.user = user;  
           next();
      } catch (err) {
-          console.error("JWT Verification Error:", err.message);
+          logger.warn("auth.jwt.invalid", { error: err.message, requestId: req.id });
           return res.status(401).json({ success: false, auth: false, message: "Invalid or expired token" });
      }
 }

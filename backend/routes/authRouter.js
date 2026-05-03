@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, updatePassword, validateStudent, logoutUser } = require('../controllers/authController');
+const { registerUser, loginUser, forgotPassword, resetPassword, refreshToken, validateStudent, logoutUser, sendVerificationEmail, verifyUser, verifyResetToken } = require('../controllers/authController');
 const { validateUser } = require('../middleware/validateUser');
 const userModel = require('../models/User');
 
@@ -7,9 +7,34 @@ const router = express();
 
 router.post('/register', registerUser);
 
+router.post('/verify', sendVerificationEmail);
+
+router.post('/verify/token', verifyUser);
+
+router.get('/verify/reset-token/:token', verifyResetToken);
+
+router.get("/verify/status", async (req, res) => {
+  const { email } = req.query;
+
+  const user = await userModel.findOne({ email });
+
+  if (!user) {
+    return res.status(404).json({ success: false });
+  }
+
+  return res.json({
+    success: true,
+    isVerified: user.isVerified
+  });
+});
+
 router.post('/login', loginUser);
 
-router.post('/updatePassword', updatePassword);
+router.post('/forgot-password', forgotPassword);
+
+router.post('/reset-password', resetPassword);
+
+router.post('/refresh-token', refreshToken);
 
 router.get('/validateUser', validateUser, (req, res) => {
      res.send({ auth: true, user: req.user });
@@ -29,6 +54,6 @@ router.get('/getData', validateUser, async (req, res) => {
 
 router.post('/validateStudent', validateUser, validateStudent);
 
-router.get('/logoutUser', validateUser, logoutUser);
+router.post('/logoutUser', validateUser, logoutUser);
 
 module.exports = router;
