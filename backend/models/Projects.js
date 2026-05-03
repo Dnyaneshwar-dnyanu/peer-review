@@ -1,15 +1,22 @@
 const mongoose = require('mongoose');
 
 const projectSchema = mongoose.Schema({
-     title: String,
+     title: {
+          type: String,
+          required: true,
+          trim: true
+     },
      description: String,
      avgMarks: {
           type: Number,
-          default: 0
+          default: 0,
+          index: true
      },
      type: {
           type: String,
           enum: ['individual', 'group'],
+          required: true,
+          index: true
      },
      members: [{
           id: String,
@@ -18,7 +25,9 @@ const projectSchema = mongoose.Schema({
      }],
      student: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User'
+          ref: 'User',
+          required: true,
+          index: true
      },
      reviews: [
           {
@@ -27,8 +36,9 @@ const projectSchema = mongoose.Schema({
           }
      ],
      submittedAt: {
+          type: Date,
           default: Date.now,
-          type: Date
+          index: true
      }
 });
 

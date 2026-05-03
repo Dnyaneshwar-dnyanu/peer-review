@@ -34,19 +34,25 @@ function Login() {
       setLoading(true);
       const res = await api.post(`/api/auth/login`, form);
 
+      console.log("Login success");
+      
+
       const data = res.data;
 
       if (data.auth) {
-        localStorage.setItem("token", data.token);
         if (data.user.role === 'student') {
           navigate('/student/dashboard');
         } else if (data.user.role === 'admin') {
           navigate('/admin/dashboard');
         }
         toast.success("Welcome back!");
+      } else {
+        navigate("/verify/email", {
+          state: { email: form.email }
+        });
+        toast.error(data.message);
       }
     } catch (err) {
-      // Axios interceptor handles console noise, we handle the UI feedback
       const message = err.response?.data?.message || "Login failed. Please check your connection.";
       toast.error(message);
     } finally {

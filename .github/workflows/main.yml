@@ -12,6 +12,45 @@ permissions:
   packages: write
 
 jobs:
+  security-audit:
+    name: Security - Audit & Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package.json
+            frontend/package.json
+
+      - name: Backend - Install & Audit
+        run: |
+          npm ci
+          npm audit --audit-level=high
+        working-directory: backend
+
+      - name: Frontend - Install & Audit
+        run: |
+          npm ci
+          npm audit --audit-level=high
+        working-directory: frontend
+
+      - name: Build backend image for scanning
+        run: |
+          docker build -t peer-review-backend:ci ./backend
+
+      - name: Scan backend image (Trivy)
+        uses: aquasec/trivy-action@0.24.0
+        with:
+          image-ref: peer-review-backend:ci
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+          ignore-unfixed: true
+
   test-backend:
     name: Backend - Test
     runs-on: ubuntu-latest
@@ -27,7 +66,7 @@ jobs:
 
       - name: Backend - Install & Test
         run: |
-          npm install
+          npm ci
           npm test
         working-directory: backend
         env:
@@ -48,15 +87,15 @@ jobs:
 
       - name: Frontend - Install, Lint, Test & Build
         run: |
-          npm install
-          npm run lint || true # Don't fail the build on lint warnings, only errors
+          npm ci
+          npm run lint
           npm test
           npm run build
         working-directory: frontend
 
   build-and-push-backend:
     name: Backend - Build & Push Docker Image
-    needs: test-backend
+    needs: [test-backend, test-frontend, security-audit]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -92,3 +131,25 @@ jobs:
       - name: Call Render Deploy Hook
         run: |
           curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+
+      - name: Verify deployment health
+        env:
+          HEALTH_URL: ${{ secrets.BACKEND_HEALTH_URL }}
+        run: |
+          if [ -z "$HEALTH_URL" ]; then
+            echo "BACKEND_HEALTH_URL is not set"
+            exit 1
+          fi
+
+          for i in {1..20}; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL/healthz")
+            if [ "$code" = "200" ]; then
+              echo "Deployment is healthy"
+              exit 0
+            fi
+            echo "Waiting for health check... ($i)"
+            sleep 10
+          done
+
+          echo "Health check failed"
+          exit 1

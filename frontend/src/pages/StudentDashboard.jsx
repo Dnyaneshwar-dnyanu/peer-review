@@ -47,7 +47,7 @@ function StudentDashboard() {
     try {
       setLoading(true);
 
-      const res = await api.get(`/api/auth/logoutUser`);
+      const res = await api.post(`/api/auth/logoutUser`);
 
       if (!res.data.auth) {
         toast.info('Logged out successfully!')

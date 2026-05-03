@@ -1,4 +1,5 @@
 const userModel = require('../models/User');
+const logger = require('../utils/logger');
 
 module.exports.isUserProject = async (req, res) => {
     try {
@@ -10,7 +11,7 @@ module.exports.isUserProject = async (req, res) => {
         );
         res.send({ status });
     } catch (err) {
-        console.error(err);
+        logger.error("user.is-project.error", { error: err.message, stack: err.stack, requestId: req.id, userId: req.user?._id ? String(req.user._id) : null });
         res.status(500).send({ success: false, message: "Internal Server Error" });
     }
 }

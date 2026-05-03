@@ -13,13 +13,6 @@ function ProtectedRoute({ children, allowedRoles }) {
      }, []);
 
      const checkAuth = async () => {
-          const token = localStorage.getItem("token");
-          if (!token) {
-               setUserRole(undefined);
-               setLoading(false);
-               return;
-          }
-
           try {
                const res = await api.get(`/api/auth/validateUser`);
 

@@ -4,10 +4,10 @@ const { validateUser } = require('../middleware/validateUser');
 const { joinClassroom, exitClassroom } = require('../controllers/classroomController');
 const { isUserProject } = require('../controllers/userController')
 
-router.get('/room/:roomCode/join', validateUser, joinClassroom);
+router.post('/room/:roomCode/join', validateUser, joinClassroom);
 
 router.get('/:projectID/isUserProject', validateUser, isUserProject);
 
-router.get('/:roomID/exit', validateUser, exitClassroom);
+router.post('/:roomID/exit', validateUser, exitClassroom);
 
 module.exports = router;

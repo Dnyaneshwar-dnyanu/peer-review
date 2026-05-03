@@ -1,5 +1,5 @@
 import api from '../api/axios';
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom';
 import { FaUser, FaIdCard, FaEnvelope, FaLock  } from "react-icons/fa";
 import { toast } from 'react-toastify';
@@ -68,13 +68,9 @@ function Register() {
                const data = res.data;
 
                if (data.success) {
-                    localStorage.setItem("token", data.token);
-                    if (data.user.role === 'student') {
-                         navigate('/student/dashboard');
-                    }
-                    else if (data.user.role === 'admin') {
-                         navigate('/admin/dashboard');
-                    }
+                    navigate("/verify/email", {
+                         state: { email: form.email }
+                    });
                     toast.success("Successfully Registered!");
                }
           } catch (err) {

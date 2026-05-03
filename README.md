@@ -11,6 +11,7 @@
 <hr />
 
 ## 🚀 Live Demo
+
 - 🌐 Frontend: [https://peer-review-system.vercel.app](https://student-peer-review-nu.vercel.app/)
 - 🔗 Backend: [https://peer-review-backend.onrender.com](https://peer-review-yyx3.onrender.com)
 
@@ -44,8 +45,6 @@
 
 ---
 
-
-
 ### 🧠 System Architecture
 
 ```
@@ -61,8 +60,6 @@
 * MongoDB stores users, rooms, projects, and reviews
 
 ---
-
-
 
 ## 🛠️ Tech Stack
 
@@ -83,8 +80,6 @@
 
 ---
 
-
-
 ## 🔐 Authentication Flow
 
 * JWT token generated on login
@@ -93,8 +88,6 @@
 * Role-based authorization ensures correct access
 
 ---
-
-
 
 ## 🔄 Real-Time Updates Strategy
 
@@ -150,6 +143,13 @@ Create a .env file:
 ```
 MONGO_URI=mongodb://localhost:27017/peer-review
 JWT_KEY=your_secret_key
+FRONTEND_URL=http://localhost:5173
+CORS_ORIGINS=http://localhost:5173
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+JWT_EXPIRES_IN=15m
+REFRESH_TOKEN_EXPIRES_IN=7d
+LOG_LEVEL=info
 ```
 
 ### 3️⃣ Frontend setup
@@ -160,11 +160,113 @@ npm install
 npm run dev
 ```
 
+---
 
+## 🔧 Operations Runbook
+
+### Environments
+
+* Local: `http://localhost:5173` (frontend) + `http://localhost:3000` (backend)
+* Dev/Staging: Use dedicated URLs and isolated MongoDB instances
+* Production: Render backend + Vercel frontend (or your hosting setup)
+
+### Health and readiness
+
+* `GET /healthz` returns process status and uptime
+* `GET /readyz` returns readiness based on MongoDB connection
+
+### Logs
+
+* JSON structured logs with `timestamp`, `level`, `message`, `requestId`, `userId`, `latencyMs`
+* Set log level via `LOG_LEVEL` (e.g., `info`, `warn`, `error`)
+
+### CI/CD secrets
+
+* `RENDER_DEPLOY_HOOK` - triggers backend deploy on Render
+* `BACKEND_HEALTH_URL` - base URL for health checks (example: `https://peer-review-backend.onrender.com`)
+* `RENDER_ROLLBACK_HOOK` - optional rollback hook for auto-revert on failed health checks
 
 ---
 
+## 💾 Backup and Restore
 
+Prerequisites: MongoDB Database Tools (`mongodump`, `mongorestore`) installed on the machine.
+
+### Backup (Linux/macOS)
+
+```
+export MONGO_URI=mongodb://localhost:27017/peer-review
+export BACKUP_DIR=./backups
+./backend/scripts/backup.sh
+```
+
+### Backup (Windows PowerShell)
+
+```
+$env:MONGO_URI="mongodb://localhost:27017/peer-review"
+$env:BACKUP_DIR=".\backups"
+./backend/scripts/backup.ps1
+```
+
+### Restore (Linux/macOS)
+
+```
+export MONGO_URI=mongodb://localhost:27017/peer-review
+export BACKUP_PATH=./backups/20260101-120000
+./backend/scripts/restore.sh
+```
+
+### Restore (Windows PowerShell)
+
+```
+$env:MONGO_URI="mongodb://localhost:27017/peer-review"
+$env:BACKUP_PATH=".\backups\20260101-120000"
+./backend/scripts/restore.ps1
+```
+
+### Restore drill (recommended monthly)
+
+* Take a fresh backup from production
+* Restore into staging or a local environment
+* Run smoke tests (login, create room, add project)
+* Record duration and any issues in the release notes
+
+---
+
+## 🚨 Incident Response
+
+* Triage: confirm impact and capture request IDs from logs
+* Mitigate: rollback via `RENDER_ROLLBACK_HOOK` or redeploy last known good image
+* Communicate: post status update to stakeholders
+* Resolve: fix root cause and deploy patch
+* Postmortem: document timeline, fix action items, add tests
+
+---
+
+## ✅ Release Checklist
+
+* Ensure CI green: tests, lint, security audit, Trivy scan
+* Verify environment variables and secrets
+* Run database backup before production deploy
+* Deploy and verify `GET /healthz` and `GET /readyz`
+* Monitor logs for errors and latency spikes
+* Update release notes
+
+---
+
+## 🛡️ Governance
+
+Branch protection recommendation (GitHub):
+
+* Require pull request reviews
+* Require status checks:
+    * `Backend - Test`
+    * `Frontend - Lint, Test & Build`
+    * `Security - Audit & Scan`
+* Require branches to be up to date before merging
+* Restrict who can push to `main`
+
+---
 
 ### 🎓 Academic Relevance
 
@@ -179,8 +281,6 @@ This project demonstrates:
 * Real-world problem solving
 
 ---
-
-
 
 ### 👨‍💻 Author
 

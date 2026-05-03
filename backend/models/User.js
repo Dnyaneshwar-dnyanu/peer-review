@@ -4,10 +4,26 @@ let userSchema = mongoose.Schema({
      name: String,
 
      // Only for students
-     usn: String,
-     
-     email: String,
-     password: String,
+     usn: {
+          type: String,
+          index: { 
+               unique: true, 
+               sparse: true // Allows multiple null/undefined values for admins
+          }
+     },
+
+     email: {
+          type: String,
+          required: true,
+          unique: true,
+          index: true,
+          lowercase: true,
+          trim: true
+     },
+     password: {
+          type: String,
+          required: true
+     },
 
      // "student" or "admin"
      role: {
@@ -15,6 +31,31 @@ let userSchema = mongoose.Schema({
           enum: ['student', 'admin'],
           required: true
      },
+
+     // is email verified
+     isVerified: {
+          type: Boolean,
+          default: false,
+          index: true
+     },
+
+     // token (otp)
+     verificationToken: {
+          type: String,
+          index: true
+     },
+     verificationTokenExpires: Date,
+
+     // Verify email while reset password
+     resetPasswordToken: {
+          type: String,
+          index: true
+     },
+     resetPasswordExpires: Date,
+
+     // Refresh token (hashed)
+     refreshTokenHash: String,
+     refreshTokenExpires: Date,
 
      // Only students will use this
      projects: [
@@ -32,5 +73,8 @@ let userSchema = mongoose.Schema({
           }
      ]
 });
+
+// Add index for faster login/auth
+userSchema.index({ email: 1, isVerified: 1 });
 
 module.exports = mongoose.model('User', userSchema);

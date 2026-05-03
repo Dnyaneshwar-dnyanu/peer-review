@@ -4,6 +4,44 @@ const reviewModel = require('../models/Reviews');
 const projectModel = require('../models/Projects');
 const { v4: uuidv4 } = require('uuid');
 const ExcelJS = require("exceljs");
+const logger = require('../utils/logger');
+
+const isUserIdMatch = (value, userId) => {
+    if (!value || !userId) return false;
+    return value.toString() === userId.toString();
+};
+
+const isProjectMember = (project, userId) => {
+    if (!project || !userId) return false;
+    const userIdStr = userId.toString();
+    const studentId = project.student?._id || project.student;
+
+    if (studentId && studentId.toString() === userIdStr) return true;
+
+    if (Array.isArray(project.members)) {
+        return project.members.some((member) => String(member.id) === userIdStr);
+    }
+
+    return false;
+};
+
+const canAccessRoom = (room, user) => {
+    if (!room || !user) return false;
+
+    if (user.role === 'admin') {
+        return isUserIdMatch(room.createdBy, user._id);
+    }
+
+    const isParticipant = room.participants?.some((participant) =>
+        participant.toString() === user._id.toString()
+    );
+
+    if (isParticipant) return true;
+
+    return Array.isArray(room.projects) && room.projects.some((project) =>
+        isProjectMember(project, user._id)
+    );
+};
 
 // --- Admin Services ---
 
@@ -25,7 +63,7 @@ module.exports.createClassroom = async (req, res) => {
 
         res.status(201).json({ success: true, room: room });
     } catch (err) {
-        console.error("Unexpected Create Classroom Error:", err);
+        logger.error("classroom.create.error", { error: err.message, stack: err.stack, requestId: req.id, userId: req.user?._id ? String(req.user._id) : null });
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
@@ -43,7 +81,7 @@ module.exports.openClassroom = async (req, res) => {
 
         res.status(200).json({ success: true, code: code });
     } catch (err) {
-        console.error("Unexpected Open Classroom Error:", err);
+        logger.error("classroom.open.error", { error: err.message, stack: err.stack, requestId: req.id, userId: req.user?._id ? String(req.user._id) : null });
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
@@ -55,12 +93,11 @@ module.exports.closeClassroom = async (req, res) => {
 
         room.roomCode = "";
         room.status = "CLOSED";
-        room.participants = [];
         await room.save();
 
         res.status(200).json({ success: true, code: room.roomCode, message: "Room Closed Successfully" });
     } catch (err) {
-        console.error("Unexpected Close Classroom Error:", err);
+        logger.error("classroom.close.error", { error: err.message, stack: err.stack, requestId: req.id, userId: req.user?._id ? String(req.user._id) : null });
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
@@ -99,7 +136,7 @@ module.exports.deleteClassroom = async (req, res) => {
         res.status(200).json({ success: true, message: "Successfully deleted the classroom" });
     }
     catch (err) {
-        console.error("Unexpected Delete Classroom Error:", err);
+        logger.error("classroom.delete.error", { error: err.message, stack: err.stack, requestId: req.id, userId: req.user?._id ? String(req.user._id) : null });
         res.status(500).json({ success: false, message: "Internal Server Error" })
     }
 }
@@ -239,7 +276,7 @@ module.exports.exportEvalutionToExcel = async (req, res) => {
         res.end();
 
     } catch (err) {
-        console.error(err);
+        logger.error("classroom.export.error", { error: err.message, stack: err.stack, requestId: req.id, userId: req.user?._id ? String(req.user._id) : null });
         res.status(500).json({ success: false, message: 'Failed to download file' });
     }
 };
@@ -274,7 +311,7 @@ module.exports.joinClassroom = async (req, res) => {
 
         res.status(404).json({ success: false, message: "Invalid or Closed Room Code" });
     } catch (err) {
-        console.error("Unexpected Join Classroom Error:", err);
+        logger.error("classroom.join.error", { error: err.message, stack: err.stack, requestId: req.id, userId: req.user?._id ? String(req.user._id) : null });
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
@@ -291,7 +328,7 @@ module.exports.exitClassroom = async (req, res) => {
 
         res.status(200).json({ success: true, message: "Exited from Classroom" });
     } catch (err) {
-        console.error("Unexpected Exit Classroom Error:", err);
+        logger.error("classroom.exit.error", { error: err.message, stack: err.stack, requestId: req.id, userId: req.user?._id ? String(req.user._id) : null });
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
@@ -316,9 +353,13 @@ module.exports.getClassroomData = async (req, res) => {
 
         if (!room) return res.status(404).json({ success: false, message: "Room not found" });
 
+        if (!canAccessRoom(room, req.user)) {
+            return res.status(403).json({ success: false, message: "Access denied" });
+        }
+
         res.status(200).json({ success: true, room: room, projects: room.projects });
     } catch (err) {
-        console.error("Unexpected Get Classroom Data Error:", err);
+        logger.error("classroom.get.error", { error: err.message, stack: err.stack, requestId: req.id, userId: req.user?._id ? String(req.user._id) : null });
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
