@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, forgotPassword, resetPassword, refreshToken, validateStudent, logoutUser, sendVerificationEmail, verifyUser } = require('../controllers/authController');
+const { registerUser, loginUser, forgotPassword, resetPassword, refreshToken, validateStudent, logoutUser, sendVerificationEmail, verifyUser, verifyResetToken } = require('../controllers/authController');
 const { validateUser } = require('../middleware/validateUser');
 const userModel = require('../models/User');
 
@@ -10,6 +10,8 @@ router.post('/register', registerUser);
 router.post('/verify', sendVerificationEmail);
 
 router.post('/verify/token', verifyUser);
+
+router.get('/verify/reset-token/:token', verifyResetToken);
 
 router.get("/verify/status", async (req, res) => {
   const { email } = req.query;

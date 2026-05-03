@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FaLock } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaLock, FaCheckCircle, FaSpinner, FaExclamationTriangle } from "react-icons/fa";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import api from "../api/axios";
@@ -9,7 +9,31 @@ function ResetPassword() {
   const { token } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(true);
+  const [verified, setVerified] = useState(false);
+  const [error, setError] = useState("");
+  const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ password: "", confirmPassword: "" });
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      try {
+        const res = await api.get(`/api/auth/verify/reset-token/${token}`);
+        if (res.data.success) {
+          setVerified(true);
+          setVerifying(false);
+          // Show the "Verified" message for 2 seconds before showing the form
+          setTimeout(() => {
+            setShowForm(true);
+          }, 2000);
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || "Invalid or expired reset link");
+        setVerifying(false);
+      }
+    };
+    verifyToken();
+  }, [token]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -47,6 +71,45 @@ function ResetPassword() {
       setLoading(false);
     }
   };
+
+  if (verifying) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
+        <div className="w-full max-w-lg p-10 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-xl bg-white/10 text-center">
+          <FaSpinner className="text-4xl text-cyan-300 animate-spin mx-auto mb-4" />
+          <h2 className="text-3xl font-bold text-white mb-3">Verifying Link...</h2>
+          <p className="text-white/80">Please wait while we validate your reset request.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
+        <div className="w-full max-w-lg p-10 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-xl bg-white/10 text-center">
+          <FaExclamationTriangle className="text-4xl text-yellow-300 mx-auto mb-4" />
+          <h2 className="text-3xl font-bold text-white mb-3">Verification Failed</h2>
+          <p className="text-white/80 mb-6">{error}</p>
+          <Link to="/forgot-password" size="lg" className="inline-block px-8 py-3 bg-white text-indigo-900 rounded-lg font-semibold hover:bg-gray-200 transition">
+            Request New Link
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (verified && !showForm) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">
+        <div className="w-full max-w-lg p-10 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-xl bg-white/10 text-center animate-pulse">
+          <FaCheckCircle className="text-4xl text-green-400 mx-auto mb-4" />
+          <h2 className="text-3xl font-bold text-white mb-3">Email Verified Successfully</h2>
+          <p className="text-white/80">Redirecting to reset form...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-zinc-900 to-black px-4">

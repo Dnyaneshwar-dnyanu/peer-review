@@ -312,6 +312,27 @@ module.exports.resetPassword = async (req, res) => {
     }
 }
 
+module.exports.verifyResetToken = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const resetTokenHash = hashToken(token);
+
+        const user = await userModel.findOne({
+            resetPasswordToken: resetTokenHash,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: "Invalid or expired reset token" });
+        }
+
+        return res.status(200).json({ success: true, message: "Token is valid" });
+    } catch (err) {
+        logger.error("auth.verify-reset-token.error", { error: err.message, stack: err.stack, requestId: req.id });
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+}
+
 module.exports.refreshToken = async (req, res) => {
     try {
         const refreshToken = req.cookies.refreshToken;

@@ -183,3 +183,51 @@ describe('Project and review rules', () => {
     expect(adminDeleteRes.statusCode).toBe(200);
   });
 });
+
+describe('Password Reset flow', () => {
+  it('validates a reset token and updates the password', async () => {
+    await registerUser({
+      name: 'Reset User',
+      email: 'reset@test.com',
+      password: 'old-password',
+      role: 'student',
+      usn: '1MS23CS999'
+    });
+
+    // 1. Request reset
+    await request(app)
+      .post('/api/auth/forgot-password')
+      .send({ email: 'reset@test.com' });
+
+    const user = await userModel.findOne({ email: 'reset@test.com' });
+    expect(user.resetPasswordToken).toBeTruthy();
+
+    // Since we can't easily get the raw token (it's hashed in DB), 
+    // we'll manually set a known token for testing
+    const crypto = require('crypto');
+    const rawToken = 'test-reset-token';
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+    
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 10000;
+    await user.save();
+
+    // 2. Verify token
+    const verifyRes = await request(app).get(`/api/auth/verify/reset-token/${rawToken}`);
+    expect(verifyRes.statusCode).toBe(200);
+
+    // 3. Reset password
+    const resetRes = await request(app)
+      .post('/api/auth/reset-password')
+      .send({ token: rawToken, password: 'new-password' });
+    
+    expect(resetRes.statusCode).toBe(200);
+
+    // 4. Verify login with new password
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'reset@test.com', password: 'new-password' });
+    
+    expect(loginRes.statusCode).toBe(200);
+  });
+});
