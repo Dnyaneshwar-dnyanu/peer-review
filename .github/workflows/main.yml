@@ -47,7 +47,7 @@ jobs:
           docker build -t peer-review-backend:ci ./backend
 
       - name: Scan backend image (Trivy)
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: peer-review-backend:ci
           severity: 'HIGH,CRITICAL'
