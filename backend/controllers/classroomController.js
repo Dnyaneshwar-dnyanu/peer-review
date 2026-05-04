@@ -32,9 +32,11 @@ const canAccessRoom = (room, user) => {
         return isUserIdMatch(room.createdBy, user._id);
     }
 
-    const isParticipant = room.participants?.some((participant) =>
-        participant.toString() === user._id.toString()
-    );
+    const isParticipant = room.participants?.some((participant) => {
+        const participantId = participant?._id || participant;
+        if (!participantId) return false;
+        return participantId.toString() === user._id.toString();
+    });
 
     if (isParticipant) return true;
 

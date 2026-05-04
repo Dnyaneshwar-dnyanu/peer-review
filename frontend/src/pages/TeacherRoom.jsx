@@ -49,28 +49,10 @@ function ClassroomPage() {
 
     getRoomData();
 
-    // Auto-close room on tab/browser close
-    const handleTabClose = () => {
-      const apiBaseUrl = import.meta.env.VITE_REACT_APP_BACKEND_URL || window.location.origin;
-      const closeRoomUrl = new URL(
-        `/api/admin/closeRoom/${roomId}`,
-        apiBaseUrl
-      );
-
-      fetch(closeRoomUrl.toString(), {
-        method: 'POST',
-        keepalive: true,
-        credentials: 'include'
-      });
-    };
-
-    window.addEventListener('beforeunload', handleTabClose);
-
     let interval = setInterval(getRoomData, 5000);
 
     return () => {
       clearInterval(interval);
-      window.removeEventListener('beforeunload', handleTabClose);
     };
   }, [roomId, navigate]);
 

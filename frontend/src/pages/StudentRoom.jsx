@@ -21,7 +21,7 @@ function StudentRoom() {
 
      const refreshRoomData = async () => {
           try {
-               const res = await api.get(`/api/admin/getRoomData/${roomID}`);
+               const res = await api.get(`/api/student/getRoomData/${roomID}`);
 
                const data = res.data;
 
@@ -43,7 +43,7 @@ function StudentRoom() {
      useEffect(() => {
           const getRoomData = async () => {
                try {
-                    const res = await api.get(`/api/admin/getRoomData/${roomID}`);
+                    const res = await api.get(`/api/student/getRoomData/${roomID}`);
 
                     const data = res.data;
 
@@ -72,8 +72,23 @@ function StudentRoom() {
           return () => clearInterval(interval);
      }, [roomID, navigate]);
 
-     if (loading)
+     if (loading) {
           return <Loader />
+     }
+
+     if (!room) {
+          return (
+               <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black p-6">
+                    <div className="max-w-2xl mx-auto p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl text-white">
+                         <h2 className="text-2xl font-bold mb-3">Room unavailable</h2>
+                         <p className="text-white/80 mb-4">We could not load this classroom. Please try again or return to your dashboard.</p>
+                         <Link to="/student/dashboard" className="inline-flex items-center gap-2 p-3 border border-white/10 bg-white/65 font-semibold rounded-md">
+                              <IoArrowBackOutline className="text-zinc-600" /> Back Home
+                         </Link>
+                    </div>
+               </div>
+          );
+     }
 
      return (
           <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-zinc-900 to-black p-6 relative">
