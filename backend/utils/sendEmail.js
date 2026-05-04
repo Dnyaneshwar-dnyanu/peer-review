@@ -36,10 +36,20 @@ const sendWithResend = async (to, subject, html) => {
         throw new Error('RESEND_API_KEY is not set');
     }
 
+    // TEMPORARY (demo/testing): Resend in testing mode can only deliver to a single address.
+    // Replace with real recipient(s) or remove this block after the demo.
+    const demoRecipient = 'dnyaneshwarbhajantri18@gmail.com';
+    const originalTo = to;
+
+    logger.warn('email.demo.override', {
+        originalTo,
+        forcedTo: demoRecipient
+    });
+
     const from = process.env.EMAIL_FROM || `Peer Review <${process.env.EMAIL_USER}>`;
     const payload = {
         from,
-        to: Array.isArray(to) ? to : [to],
+        to: [demoRecipient],
         subject,
         html
     };
