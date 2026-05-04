@@ -1,3 +1,4 @@
 backup/
 .env
 **/.env
+node_modules
