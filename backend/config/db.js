@@ -1,6 +1,24 @@
 const mongoose = require('mongoose');
 const logger = require('../utils/logger');
 
+const syncIndexesIfEnabled = async () => {
+    if (process.env.MONGO_SYNC_INDEXES !== 'true') return;
+
+    const modelNames = mongoose.modelNames();
+    if (modelNames.length === 0) return;
+
+    logger.info('db.indexes.sync.start', { models: modelNames });
+
+    for (const name of modelNames) {
+        try {
+            await mongoose.model(name).syncIndexes();
+            logger.info('db.indexes.sync.success', { model: name });
+        } catch (err) {
+            logger.error('db.indexes.sync.error', { model: name, error: err.message });
+        }
+    }
+};
+
 const connectDB = async () => {
     try {
         logger.info("db.connect.start");
@@ -18,6 +36,8 @@ const connectDB = async () => {
 
         await mongoose.connect(mongoUri, options);
         logger.info("db.connect.success");
+
+        await syncIndexesIfEnabled();
 
         mongoose.connection.on('error', (err) => {
             logger.error("db.connection.error", { error: err.message });

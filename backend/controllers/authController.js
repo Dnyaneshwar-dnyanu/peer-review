@@ -10,12 +10,25 @@ const hashToken = (token) => crypto.createHash('sha256').update(token).digest('h
 
 const getCookieOptions = (maxAge) => {
     const isProd = process.env.NODE_ENV === "production";
-    return {
+    const sameSite = (process.env.COOKIE_SAMESITE || (isProd ? "none" : "lax")).toLowerCase();
+    const secure = process.env.COOKIE_SECURE
+        ? process.env.COOKIE_SECURE === "true"
+        : isProd;
+    const domain = process.env.COOKIE_DOMAIN || undefined;
+
+    const options = {
         httpOnly: true,
-        secure: isProd,
-        sameSite: isProd ? "none" : "lax",
-        maxAge
+        secure,
+        sameSite,
+        maxAge,
+        path: "/"
     };
+
+    if (domain) {
+        options.domain = domain;
+    }
+
+    return options;
 };
 
 const setAuthCookies = (res, accessToken, refreshToken) => {

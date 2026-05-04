@@ -21,7 +21,7 @@ services:
       - NODE_ENV=production
       - FRONTEND_URL=http://localhost:8080
       - CORS_ORIGINS=http://localhost:8080
-      - JWT_KEY=${JWT_KEY:-secret_fallback_for_dev_only}
+      - JWT_KEY=${JWT_KEY}
     depends_on:
       mongodb:
         condition: service_healthy

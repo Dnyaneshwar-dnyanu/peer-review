@@ -34,9 +34,6 @@ function Login() {
       setLoading(true);
       const res = await api.post(`/api/auth/login`, form);
 
-      console.log("Login success");
-      
-
       const data = res.data;
 
       if (data.auth) {
