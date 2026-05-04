@@ -27,10 +27,30 @@ if (process.env.TRUST_PROXY === 'true') {
 
 app.disable('x-powered-by');
 
+const normalizeOrigin = (origin) => origin.replace(/\/$/, '');
+
 const allowedOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '')
     .split(',')
-    .map((origin) => origin.trim())
+    .map((origin) => normalizeOrigin(origin.trim()))
     .filter(Boolean);
+
+const shouldEnforceOriginCheck = process.env.ENFORCE_ORIGIN_CHECK
+    ? process.env.ENFORCE_ORIGIN_CHECK === 'true'
+    : process.env.NODE_ENV === 'production';
+
+const isUnsafeMethod = (method) => !['GET', 'HEAD', 'OPTIONS'].includes(method);
+
+const getRequestOrigin = (req) => {
+    if (req.headers.origin) return req.headers.origin;
+    if (!req.headers.referer) return null;
+
+    try {
+        const refererUrl = new URL(req.headers.referer);
+        return refererUrl.origin;
+    } catch (err) {
+        return null;
+    }
+};
 
 app.use(helmet());
 
@@ -40,17 +60,19 @@ app.use(cors({
             return callback(null, true);
         }
 
+        const normalizedOrigin = normalizeOrigin(origin);
+
         if (allowedOrigins.length === 0 && process.env.NODE_ENV !== 'production') {
             return callback(null, true);
         }
 
-        if (allowedOrigins.includes(origin)) {
+        if (allowedOrigins.includes(normalizedOrigin)) {
             return callback(null, true);
         }
 
         return callback(new Error('Not allowed by CORS'));
     },
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Request-Id"],
     credentials: true,
     exposedHeaders: ["Content-Disposition", "X-Request-Id"]
@@ -86,6 +108,41 @@ app.use((req, res, next) => {
     });
 
     next();
+});
+
+app.use((req, res, next) => {
+    if (!shouldEnforceOriginCheck || !isUnsafeMethod(req.method)) {
+        return next();
+    }
+
+    if (allowedOrigins.length === 0) {
+        return next();
+    }
+
+    const requestOrigin = getRequestOrigin(req);
+
+    if (!requestOrigin) {
+        logger.warn('csrf.origin.missing', {
+            requestId: req.id,
+            method: req.method,
+            path: req.originalUrl
+        });
+        return res.status(403).json({ success: false, message: 'Origin required' });
+    }
+
+    const normalizedOrigin = normalizeOrigin(requestOrigin);
+
+    if (!allowedOrigins.includes(normalizedOrigin)) {
+        logger.warn('csrf.origin.blocked', {
+            requestId: req.id,
+            method: req.method,
+            path: req.originalUrl,
+            origin: requestOrigin
+        });
+        return res.status(403).json({ success: false, message: 'Origin not allowed' });
+    }
+
+    return next();
 });
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));

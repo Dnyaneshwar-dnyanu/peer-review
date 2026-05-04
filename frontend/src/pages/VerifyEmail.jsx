@@ -76,7 +76,7 @@ function VerifyEmail() {
           }, 2000);
         }
       } catch (err) {
-        console.log("Polling error", err);
+        // Ignore polling errors; the next interval will retry.
       }
     }, 3000);
 

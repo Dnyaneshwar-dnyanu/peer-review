@@ -3,7 +3,7 @@ const { registerUser, loginUser, forgotPassword, resetPassword, refreshToken, va
 const { validateUser } = require('../middleware/validateUser');
 const userModel = require('../models/User');
 
-const router = express();
+const router = express.Router();
 
 router.post('/register', registerUser);
 

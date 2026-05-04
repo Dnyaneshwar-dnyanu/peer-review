@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiBaseUrl = import.meta.env.VITE_REACT_APP_BACKEND_URL || window.location.origin;
+const apiBaseUrl = (import.meta.env.VITE_REACT_APP_BACKEND_URL || window.location.origin).replace(/\/$/, "");
 
 const api = axios.create({
   baseURL: apiBaseUrl,
@@ -13,6 +13,17 @@ const refreshClient = axios.create({
 });
 
 // Add a response interceptor to handle errors globally and reduce console noise
+const shouldSkipRefresh = (url) => {
+  if (!url) return false;
+  return (
+    url.includes('/api/auth/login') ||
+    url.includes('/api/auth/register') ||
+    url.includes('/api/auth/verify') ||
+    url.includes('/api/auth/forgot-password') ||
+    url.includes('/api/auth/reset-password')
+  );
+};
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -23,7 +34,8 @@ api.interceptors.response.use(
       error.response.status === 401 &&
       originalRequest &&
       !originalRequest._retry &&
-      !originalRequest.url?.includes('/api/auth/refresh-token')
+      !originalRequest.url?.includes('/api/auth/refresh-token') &&
+      !shouldSkipRefresh(originalRequest.url)
     ) {
       originalRequest._retry = true;
       try {

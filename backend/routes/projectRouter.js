@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express();
+const router = express.Router();
 const { validateUser } = require('../middleware/validateUser');
 const { getProjectInfo, addProject, getProjects, addReviewToProject, getReviews, getReviewStatus, updateProject, deleteProject } = require('../controllers/projectController');
 const { Mongoose } = require('mongoose');

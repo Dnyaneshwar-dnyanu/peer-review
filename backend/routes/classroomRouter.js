@@ -2,7 +2,7 @@ const express = require('express');
 const { validateUser } = require('../middleware/validateUser');
 const { isAdmin } = require('../middleware/isAdmin');
 const { createClassroom, getClassroomData, exportEvalutionToCSV, openClassroom, closeClassroom, deleteClassroom, exportEvalutionToExcel } = require('../controllers/classroomController');
-const router = express();
+const router = express.Router();
 
 router.post('/createRoom', validateUser, isAdmin, createClassroom);
 router.get('/getRoomData/:roomId', validateUser, getClassroomData);
