@@ -26,7 +26,7 @@ function ForgotPassword() {
             const data = res.data;
 
             if (data.success) {
-                toast.success(data.message || "If that email exists, a reset link has been sent.");
+                toast.success(data.message || "Reset link has been sent.");
             } else {
                 toast.error(data.message || "Failed to send reset email.");
             }

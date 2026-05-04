@@ -54,7 +54,7 @@ function VerifyEmail() {
       };
 
       verify();
-      return; // ⛔ stop here (no polling)
+      return; 
     }
 
     // 📩 NO TOKEN MODE → polling
@@ -76,7 +76,10 @@ function VerifyEmail() {
           }, 2000);
         }
       } catch (err) {
-        // Ignore polling errors; the next interval will retry.
+        const message =
+        err.response?.data?.message ||
+        "Email verification failed";
+        console.error(message);
       }
     }, 3000);
 
