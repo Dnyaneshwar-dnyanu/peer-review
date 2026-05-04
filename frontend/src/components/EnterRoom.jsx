@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import { useState } from 'react'
 import Loader from './Loader';
 import { toast } from 'react-toastify';
 import api from '../api/axios';
@@ -17,7 +17,7 @@ function EnterRoom({ toggleModal }) {
         try {
             setLoading(true);
 
-            const res = await api.get(`/api/student/room/${roomCode}/join`);
+            const res = await api.post(`/api/student/room/${roomCode}/join`);
 
             if (res.data.success) {
                 navigate(`/student/room/${roomCode.toLowerCase()}/${res.data.roomID}`);

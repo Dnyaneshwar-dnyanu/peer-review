@@ -7,8 +7,8 @@ const router = express();
 router.post('/createRoom', validateUser, isAdmin, createClassroom);
 router.get('/getRoomData/:roomId', validateUser, getClassroomData);
 router.get('/export/:roomID', validateUser, isAdmin, exportEvalutionToExcel);
-router.get('/openRoom/:roomID', validateUser, isAdmin, openClassroom);
-router.get('/closeRoom/:roomID', validateUser, isAdmin, closeClassroom);
+router.post('/openRoom/:roomID', validateUser, isAdmin, openClassroom);
+router.post('/closeRoom/:roomID', validateUser, isAdmin, closeClassroom);
 router.delete('/:roomID/delete', validateUser, isAdmin, deleteClassroom);
 
 module.exports = router;

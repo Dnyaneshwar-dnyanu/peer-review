@@ -50,11 +50,15 @@ function ClassroomPage() {
     getRoomData();
 
     // Auto-close room on tab/browser close
-    const handleTabClose = (e) => {
-      const url = `${window.location.origin}${import.meta.env.VITE_REACT_APP_BACKEND_URL}/api/admin/closeRoom/${roomId}`;
-      // Use fetch with keepalive and credentials
-      fetch(url, {
-        method: 'GET',
+    const handleTabClose = () => {
+      const apiBaseUrl = import.meta.env.VITE_REACT_APP_BACKEND_URL || window.location.origin;
+      const closeRoomUrl = new URL(
+        `/api/admin/closeRoom/${roomId}`,
+        apiBaseUrl
+      );
+
+      fetch(closeRoomUrl.toString(), {
+        method: 'POST',
         keepalive: true,
         credentials: 'include'
       });
@@ -74,7 +78,7 @@ function ClassroomPage() {
     try {
       setCloseRoomButton(true);
 
-      const res = await api.get(`/api/admin/openRoom/${roomId}`);
+      const res = await api.post(`/api/admin/openRoom/${roomId}`);
 
       if (res.status !== 200) throw new Error("Failed!");
 
@@ -100,7 +104,7 @@ function ClassroomPage() {
     try {
       setCloseRoomButton(true);
 
-      const res = await api.get(`/api/admin/closeRoom/${roomId}`);
+      const res = await api.post(`/api/admin/closeRoom/${roomId}`);
 
       if (res.status !== 200) throw new Error("Failed!");
 

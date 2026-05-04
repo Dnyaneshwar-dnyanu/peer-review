@@ -54,7 +54,7 @@ function TeacherDashboard() {
           try {
                setLoading(true);
 
-               const res = await api.get(`/api/auth/logoutUser`);
+               const res = await api.post(`/api/auth/logoutUser`);
      
                if (res.status !== 200) throw new Error("Failed");
      
