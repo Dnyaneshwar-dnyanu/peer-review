@@ -12,8 +12,17 @@
 
 ## 🚀 Live Demo
 
-- 🌐 Frontend: [https://peer-review-system.vercel.app](https://student-peer-review-nu.vercel.app/)
-- 🔗 Backend: [https://peer-review-backend.onrender.com](https://peer-review-yyx3.onrender.com)
+- 🌐 Frontend: [https://student-peer-review-nu.vercel.app/](https://student-peer-review-nu.vercel.app/)
+- 🔗 Backend: [https://peer-review-backend-r75l.onrender.com](https://peer-review-backend-r75l.onrender.com)
+
+## 🖼️ Screenshots
+
+> Add your screenshots to a `/screenshots` folder and update this section with the final images.
+
+- Login and registration
+- Teacher dashboard and classroom
+- Student dashboard and classroom
+- Project evaluation and export
 
 ## 🚀 Features
 
@@ -26,6 +35,7 @@
 * Evaluate student projects (marks + feedback)
 * Close classrooms to stop submissions
 * Export evaluation data as CSV
+* Export evaluation data as Excel (XLSX)
 
 ### 🧑‍🎓 Student
 
@@ -48,11 +58,11 @@
 ### 🧠 System Architecture
 
 ```
-            Frontend (React + Tailwind)         `
-
-            ↓ Backend (Node.js + Express)`
-
-            ↓ Database (MongoDB)`
+Frontend (React + Tailwind)
+          ↓
+Backend (Node.js + Express)
+          ↓
+Database (MongoDB)
 ```
 
 * Frontend handles UI and user interaction
@@ -60,6 +70,15 @@
 * MongoDB stores users, rooms, projects, and reviews
 
 ---
+
+## 🧭 Architecture Diagram
+
+```mermaid
+flowchart LR
+  UI[React + Tailwind] -->|HTTPS| API[Node.js + Express]
+  API -->|Mongoose| DB[(MongoDB)]
+  API -->|SMTP| Mail[(Email Provider)]
+```
 
 ## 🛠️ Tech Stack
 
@@ -180,6 +199,39 @@ npm run dev
 * JSON structured logs with `timestamp`, `level`, `message`, `requestId`, `userId`, `latencyMs`
 * Set log level via `LOG_LEVEL` (e.g., `info`, `warn`, `error`)
 
+---
+
+## 📈 Monitoring
+
+### UptimeRobot
+
+* Monitor `GET /healthz` for uptime
+* Optionally monitor `GET /readyz` for database readiness
+* Use the public backend URL (Render) for checks and alerts
+
+### Prometheus
+
+* A sample Prometheus configuration is provided in `prometheus.yml`
+* Default scrape target: `host.docker.internal:3000`
+* If you expose a metrics endpoint (for example, `/metrics`), update the scrape config accordingly
+
+---
+
+## 🧪 DevOps Pipeline (CI/CD)
+
+This repository includes a GitHub Actions workflow at `.github/workflows/main.yml`.
+
+### On every push or pull request to `main`
+
+* **Security - Audit & Scan**: installs dependencies, runs `npm audit`, builds backend image, and scans with Trivy
+* **Backend - Test**: installs backend dependencies and runs `npm test`
+* **Frontend - Lint, Test & Build**: runs `npm run lint`, `npm test`, and `npm run build`
+
+### On push to `main`
+
+* **Backend - Build & Push Docker Image**: pushes to GitHub Container Registry (GHCR)
+* **Backend - Trigger Render Deployment**: calls the Render deploy hook and verifies `/healthz`
+
 ### CI/CD secrets
 
 * `RENDER_DEPLOY_HOOK` - triggers backend deploy on Render
@@ -260,9 +312,9 @@ Branch protection recommendation (GitHub):
 
 * Require pull request reviews
 * Require status checks:
-    * `Backend - Test`
-    * `Frontend - Lint, Test & Build`
-    * `Security - Audit & Scan`
+  * `Backend - Test`
+  * `Frontend - Lint, Test & Build`
+  * `Security - Audit & Scan`
 * Require branches to be up to date before merging
 * Restrict who can push to `main`
 

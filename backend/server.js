@@ -14,6 +14,7 @@ const projectRouter = require('./routes/projectRouter');
 require('dotenv').config();
 const connectDB = require('./config/db');
 const logger = require('./utils/logger');
+const client = require("prom-client");
 
 if (process.env.NODE_ENV !== 'test') {
     connectDB();
@@ -144,6 +145,24 @@ app.use((req, res, next) => {
 
     return next();
 });
+
+const httpRequestCounter = new client.Counter({
+  name: "http_requests_total",
+  help: "Total number of HTTP requests",
+  labelNames: ["method", "route", "status"]
+});
+
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    httpRequestCounter.inc({
+      method: req.method,
+      route: req.route?.path || req.path,
+      status: res.statusCode
+    });
+  });
+  next();
+});
+
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -155,6 +174,15 @@ app.use('/api/projects', projectRouter);
 
 app.get('/', (req, res) => {
     res.send("Peer Review Server is Working Fine");
+});
+
+// collect default metrics (CPU, memory, etc.)
+client.collectDefaultMetrics();
+
+// metrics endpoint
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", client.register.contentType);
+  res.end(await client.register.metrics());
 });
 
 app.get('/healthz', (req, res) => {
