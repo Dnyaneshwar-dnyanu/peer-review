@@ -15,6 +15,8 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 const logger = require('./utils/logger');
 const client = require("prom-client");
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
 
 if (process.env.NODE_ENV !== 'test') {
     connectDB();
