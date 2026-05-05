@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+require('dotenv').config();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -11,7 +12,6 @@ const authRouter = require('./routes/authRouter');
 const classroomRouter = require('./routes/classroomRouter');
 const userRouter = require('./routes/userRouter');
 const projectRouter = require('./routes/projectRouter');
-require('dotenv').config();
 const connectDB = require('./config/db');
 const logger = require('./utils/logger');
 const client = require("prom-client");

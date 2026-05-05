@@ -282,7 +282,7 @@ module.exports.forgotPassword = async (req, res) => {
             await sendEmail(user.email, subject, html);
         }
 
-        res.json({ success: true, message: "If that email exists, a reset link has been sent." });
+        res.json({ success: true, message: "Reset link has been sent." });
     }
     catch (err) {
         logger.error("auth.forgot-password.error", { error: err.message, stack: err.stack, requestId: req.id });
