@@ -32,7 +32,7 @@ app.disable('x-powered-by');
 
 const normalizeOrigin = (origin) => origin.replace(/\/$/, '');
 
-const allowedOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL)
+const allowedOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '')
     .split(',')
     .map((origin) => normalizeOrigin(origin.trim()))
     .filter(Boolean);
