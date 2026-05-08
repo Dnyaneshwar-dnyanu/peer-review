@@ -252,7 +252,7 @@ function ProjectInfo() {
                                         Reviews
                                     </span>
 
-                                    {/* {
+                                    {
                                         room.participants.length > 0 && (
                                             <span className="text-2xl font-bold text-cyan-200">
                                                 {project.reviews.length}
@@ -260,13 +260,16 @@ function ProjectInfo() {
                                                 <span className="text-white/40 text-lg font-medium">
                                                     {" "} / {
                                                         project.type === 'group'
-                                                            ? Math.max(room.participants.length - project.members.length, 0)
-                                                            : room.participants.length
+                                                            ? Math.max(
+                                                                (room.participants.length - project.members.length) + 1,
+                                                                1
+                                                            )
+                                                            : room.participants.length + 1
                                                     }
                                                 </span>
                                             </span>
                                         )
-                                    } */}
+                                    }
                                 </div>
 
                                 <div className="h-12 w-px bg-white/10 mx-6" />

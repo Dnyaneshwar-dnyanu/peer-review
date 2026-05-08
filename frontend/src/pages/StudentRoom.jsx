@@ -41,8 +41,20 @@ function StudentRoom() {
      }
 
      useEffect(() => {
+          let interval;
+          let isFetching = false;
+
           const getRoomData = async () => {
+
+               // prevent duplicate requests
+               if (isFetching) return;
+
+               // stop polling when tab inactive
+               if (document.hidden) return;
+
                try {
+                    isFetching = true;
+
                     const res = await api.get(`/api/student/getRoomData/${roomID}`);
 
                     const data = res.data;
@@ -50,26 +62,34 @@ function StudentRoom() {
                     if (data.room.status === 'CLOSED') {
                          toast.info("Classroom Closed");
                          navigate('/student/dashboard');
-
-                    } else {
-                         setRoom(data.room);
-                         setProjects(data.projects);
+                         return;
                     }
+
+                    setRoom(data.room);
+
+                    setProjects(
+                         [...data.projects].sort(
+                              (a, b) =>
+                                   new Date(b.submittedAt) -
+                                   new Date(a.submittedAt)
+                         )
+                    );
 
                } catch (err) {
                     console.error(err);
-                    toast.error("Something error occurred!");
 
                } finally {
+                    isFetching = false;
                     setLoading(false);
                }
-          }
+          };
 
           getRoomData();
 
-          let interval = setInterval(getRoomData, 5000);
+          interval = setInterval(getRoomData, 5000);
 
           return () => clearInterval(interval);
+
      }, [roomID, navigate]);
 
      if (loading) {
@@ -122,7 +142,7 @@ function StudentRoom() {
                                    overflow-hidden hover:bg-gray-200 transition-all duration-1000 ease-in-out
                                    ${showForm ? 'max-h-0 opacity-0' : 'max-h-16 opacity-100'}
                                    `}>
-                                        Click to Add Project
+                              Click to Add Project
                          </button>
                     }
 

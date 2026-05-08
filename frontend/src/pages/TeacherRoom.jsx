@@ -44,7 +44,9 @@ function ClassroomPage() {
         const data = res.data;
 
         setRoom(data.room);
-        setProjects(data.projects);
+        setProjects([...data.projects].sort(
+          (a, b) => new Date(b.submittedAt) - new Date(a.submittedAt)
+        ));
         setRoomCode(data.room.roomCode);
 
       } catch (err) {
