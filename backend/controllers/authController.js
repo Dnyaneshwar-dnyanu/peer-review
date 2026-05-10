@@ -9,25 +9,14 @@ const hashToken = (token) => crypto.createHash('sha256').update(token).digest('h
 
 const getCookieOptions = (maxAge) => {
     const isProd = process.env.NODE_ENV === "production";
-    const sameSite = (process.env.COOKIE_SAMESITE || (isProd ? "none" : "lax")).toLowerCase();
-    const secure = process.env.COOKIE_SECURE
-        ? process.env.COOKIE_SECURE === "true"
-        : isProd;
-    const domain = process.env.COOKIE_DOMAIN || undefined;
 
-    const options = {
+    return {
         httpOnly: true,
-        secure,
-        sameSite,
+        secure: isProd,
+        sameSite: isProd ? "none" : "lax",
         maxAge,
-        path: "/"
+        path: "/",
     };
-
-    if (domain) {
-        options.domain = domain;
-    }
-
-    return options;
 };
 
 const setAuthCookies = (res, accessToken, refreshToken) => {
@@ -84,7 +73,11 @@ module.exports.registerUser = async (req, res) => {
             user.refreshTokenExpires = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE_MS);
             await user.save();
 
-            setAuthCookies(res, accessToken, refreshToken);
+            try {
+                setAuthCookies(res, accessToken, refreshToken);
+            } catch (error) {
+                console.log("Failed to store cookies: ", error);            
+            }
 
             return res.status(201).json({ success: true, auth: true, user: sanitizeUser(user) });
         }
