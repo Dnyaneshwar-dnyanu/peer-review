@@ -38,9 +38,9 @@ function Login() {
 
       if (data.auth) {
         if (data.user.role === 'student') {
-          navigate('/student/dashboard');
+          window.location.href = '/student/dashboard';
         } else if (data.user.role === 'admin') {
-          navigate('/admin/dashboard');
+          window.location.href = '/admin/dashboard';
         }
         toast.success("Welcome back!");
       } else {

@@ -33,4 +33,4 @@ router.post('/validateStudent', validateUser, validateStudent);
 
 router.post('/logoutUser', validateUser, logoutUser);
 
-module.exports = router;
+module.exports = router; 

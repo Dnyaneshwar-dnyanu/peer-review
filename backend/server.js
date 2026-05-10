@@ -199,6 +199,13 @@ app.get('/readyz', (req, res) => {
     res.status(code).json({ status });
 });
 
+app.get("/debug-cookie", (req, res) => {
+    res.json({
+        cookies: req.cookies,
+        headers: req.headers.cookie || null
+    });
+});
+
 // Global Error Handler
 app.use((err, req, res, next) => {
     logger.error('http.error', {
