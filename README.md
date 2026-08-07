@@ -164,8 +164,6 @@ MONGO_URI=mongodb://localhost:27017/peer-review
 JWT_KEY=your_secret_key
 FRONTEND_URL=http://localhost:5173
 CORS_ORIGINS=http://localhost:5173
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
 JWT_EXPIRES_IN=15m
 REFRESH_TOKEN_EXPIRES_IN=7d
 LOG_LEVEL=info
@@ -240,83 +238,13 @@ This repository includes a GitHub Actions workflow at `.github/workflows/main.ym
 
 ---
 
-## 💾 Backup and Restore
+## 🚀 Future Implementations
 
-Prerequisites: MongoDB Database Tools (`mongodump`, `mongorestore`) installed on the machine.
-
-### Backup (Linux/macOS)
-
-```
-export MONGO_URI=mongodb://localhost:27017/peer-review
-export BACKUP_DIR=./backups
-./backend/scripts/backup.sh
-```
-
-### Backup (Windows PowerShell)
-
-```
-$env:MONGO_URI="mongodb://localhost:27017/peer-review"
-$env:BACKUP_DIR=".\backups"
-./backend/scripts/backup.ps1
-```
-
-### Restore (Linux/macOS)
-
-```
-export MONGO_URI=mongodb://localhost:27017/peer-review
-export BACKUP_PATH=./backups/20260101-120000
-./backend/scripts/restore.sh
-```
-
-### Restore (Windows PowerShell)
-
-```
-$env:MONGO_URI="mongodb://localhost:27017/peer-review"
-$env:BACKUP_PATH=".\backups\20260101-120000"
-./backend/scripts/restore.ps1
-```
-
-### Restore drill (recommended monthly)
-
-* Take a fresh backup from production
-* Restore into staging or a local environment
-* Run smoke tests (login, create room, add project)
-* Record duration and any issues in the release notes
-
----
-
-## 🚨 Incident Response
-
-* Triage: confirm impact and capture request IDs from logs
-* Mitigate: rollback via `RENDER_ROLLBACK_HOOK` or redeploy last known good image
-* Communicate: post status update to stakeholders
-* Resolve: fix root cause and deploy patch
-* Postmortem: document timeline, fix action items, add tests
-
----
-
-## ✅ Release Checklist
-
-* Ensure CI green: tests, lint, security audit, Trivy scan
-* Verify environment variables and secrets
-* Run database backup before production deploy
-* Deploy and verify `GET /healthz` and `GET /readyz`
-* Monitor logs for errors and latency spikes
-* Update release notes
-
----
-
-## 🛡️ Governance
-
-Branch protection recommendation (GitHub):
-
-* Require pull request reviews
-* Require status checks:
-  * `Backend - Test`
-  * `Frontend - Lint, Test & Build`
-  * `Security - Audit & Scan`
-* Require branches to be up to date before merging
-* Restrict who can push to `main`
+* 🎥 **Online Project Presentation** – Conduct live presentations with video and screen sharing.
+* 📅 **Presentation Scheduling** – Teachers can schedule project presentation slots.
+* 🤖 **AI-Assisted Evaluation** – Use AI to analyze project details and assist teachers with feedback and evaluation suggestions.
+* 📊 **Evaluation Rubrics** – Evaluate projects based on predefined criteria.
+* 🔔 **Smart Notifications** – Notify students about presentation schedules, deadlines, and evaluation results.
 
 ---
 
