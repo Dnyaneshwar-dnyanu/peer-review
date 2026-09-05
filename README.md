@@ -1,5 +1,5 @@
 <div align="center">
-            <img width="400" height="400" alt="fd4656d0-fab6-4c3c-a958-aed5f8833169" src="https://github.com/user-attachments/assets/01c05d14-2454-4d40-952d-27412cfb5095" />
+            <img width="400" height="300" alt="fd4656d0-fab6-4c3c-a958-aed5f8833169" src="https://github.com/user-attachments/assets/01c05d14-2454-4d40-952d-27412cfb5095" />
             <br>
             A full-stack web application designed to streamline the <b>academic peer review process</b> in colleges.
             <br>
@@ -15,70 +15,57 @@
 - 🌐 Frontend: [https://student-peer-review-nu.vercel.app/](https://student-peer-review-nu.vercel.app/)
 - 🔗 Backend: [https://peer-review-backend-r75l.onrender.com](https://peer-review-backend-r75l.onrender.com)
 
-## 🖼️ Screenshots
-
-> Add your screenshots to a `/screenshots` folder and update this section with the final images.
-
-- Login and registration
-- Teacher dashboard and classroom
-- Student dashboard and classroom
-- Project evaluation and export
-
 ## 🚀 Features
+
+<table>
+<tr>
+<td width="33%" valign="top">
 
 ### 👩‍🏫 Teacher
 
-* Secure authentication
-* Create and manage classrooms
-* Generate unique room codes
-* View participants and submitted projects
-* Evaluate student projects (marks + feedback)
-* Close classrooms to stop submissions
-* Export evaluation data as CSV
-* Export evaluation data as Excel (XLSX)
+- Create and manage classrooms
+- Generate unique room codes
+- View participants and submitted projects
+- Evaluate student projects (marks + feedback)
+- Close classrooms to stop submissions
+- Export evaluation data as Excel (XLSX)
+
+</td>
+
+<td width="33%" valign="top">
 
 ### 🧑‍🎓 Student
 
-* Secure authentication
-* Join classrooms using room code
-* Submit project details
-* View feedback and marks
-* Automatic redirection when classroom is closed
+- Join classrooms using room code
+- Submit project details
+- View feedback and marks
+- Submit feedback and marks to others projects
+- Automatic redirection when classroom is closed
+
+</td>
+
+<td width="33%" valign="top">
 
 ### 🔐 General
 
-* Role-based access control (Teacher / Student)
-* JWT authentication with cookies
-* Real-time UI updates using polling
-* Clean glassmorphism UI
-* Responsive design
+- Secure authentication
+- Role-based access control (Teacher / Student)
+- JWT authentication with cookies
+- Real-time UI updates using polling
+- Clean glassmorphism UI
+- Responsive design
 
----
-
-### 🧠 System Architecture
-
-```
-Frontend (React + Tailwind)
-          ↓
-Backend (Node.js + Express)
-          ↓
-Database (MongoDB)
-```
-
-* Frontend handles UI and user interaction
-* Backend handles authentication, business logic, and CSV export
-* MongoDB stores users, rooms, projects, and reviews
+</td>
+</tr>
+</table>
 
 ---
 
 ## 🧭 Architecture Diagram
 
-```mermaid
-flowchart LR
-  UI[React + Tailwind] -->|HTTPS| API[Node.js + Express]
-  API -->|Mongoose| DB[(MongoDB)]
-  API -->|SMTP| Mail[(Email Provider)]
-```
+<img width="1300" height="500" alt="image" src="https://github.com/user-attachments/assets/65f91d02-6ed0-4e76-ba1f-f8920b9ac506" />
+
+---
 
 ## 🛠️ Tech Stack
 
@@ -119,34 +106,12 @@ The system uses **polling** to synchronize data across users.
 
 ---
 
-## 📊 CSV Export Feature
-
-* Teachers can download evaluation data in CSV format
-* CSV is generated dynamically on backend
-* Includes student details, project title, marks, and feedback
-* File opens directly in Excel / Google Sheets
-
----
-
-## 🧪 Testing Note (Important)
-
-> Cookies are shared across browser tabs.
-
-To test  **Teacher and Student simultaneously** , use:
-
-* Different browsers (Chrome & Brave), or
-* Incognito window
-
-This ensures correct session isolation.
-
----
-
 ## ▶️ How to Run the Project
 
 ### 1️⃣ Clone the repository
 
 ```
-git clone https://github.com/your-username/peer-review-system.git
+git clone https://github.com/dnyaneshwar-dnyanu/peer-review-system.git
 ```
 
 ### 2️⃣ Backend setup
@@ -176,27 +141,6 @@ cd frontend
 npm install
 npm run dev
 ```
-
----
-
-## 🔧 Operations Runbook
-
-### Environments
-
-* Local: `http://localhost:5173` (frontend) + `http://localhost:3000` (backend)
-* Dev/Staging: Use dedicated URLs and isolated MongoDB instances
-* Production: Render backend + Vercel frontend (or your hosting setup)
-
-### Health and readiness
-
-* `GET /healthz` returns process status and uptime
-* `GET /readyz` returns readiness based on MongoDB connection
-
-### Logs
-
-* JSON structured logs with `timestamp`, `level`, `message`, `requestId`, `userId`, `latencyMs`
-* Set log level via `LOG_LEVEL` (e.g., `info`, `warn`, `error`)
-
 ---
 
 ## 📈 Monitoring
@@ -240,28 +184,16 @@ This repository includes a GitHub Actions workflow at `.github/workflows/main.ym
 
 ## 🚀 Future Implementations
 
-* 🎥 **Online Project Presentation** – Conduct live presentations with video and screen sharing.
-* 📅 **Presentation Scheduling** – Teachers can schedule project presentation slots.
-* 🤖 **AI-Assisted Evaluation** – Use AI to analyze project details and assist teachers with feedback and evaluation suggestions.
-* 📊 **Evaluation Rubrics** – Evaluate projects based on predefined criteria.
-* 🔔 **Smart Notifications** – Notify students about presentation schedules, deadlines, and evaluation results.
-
----
-
-### 🎓 Academic Relevance
-
-This project demonstrates:
-
-* Full-stack development
-* Secure authentication
-* Role-based access control
-* Database design
-* REST API design
-* UI/UX principles
-* Real-world problem solving
+* 📊 **Multi-Criteria Rubric Evaluation** – Support weighted grading criteria with automatic score calculation.
+* 📅 **Interactive Presentation Scheduling** – Enable calendar-based presentation slot booking.
+* 🤖 **AI-Assisted Feedback & Plagiarism Detection** – Use AI to assist evaluation and detect potential plagiarism.
+* 🔗 **GitHub/GitLab Repository Linking** – Link repositories to retrieve project and commit details.
+* ⚡ **Real-Time WebSocket Notifications** – Provide instant in-app and email notifications.
+* 📈 **Classroom & Departmental Analytics Dashboards** – Visualize grades, submissions, and performance trends.
+* 📝 **Student Activity Audit Trail** – Track student actions and evaluation activities with timestamps.
 
 ---
 
 ### 👨‍💻 Author
 
-Developed as an academic project to improve transparency and efficiency in project evaluation systems.
+Built to help college teachers streamline project evaluation, reduce manual effort, and make the review process more efficient and transparent.
