@@ -195,10 +195,11 @@ app.get("/metrics", async (req, res) => {
 
 app.get('/healthz', (req, res) => {
     const isDbConnected = mongoose.connection.readyState === 1;
-    if (!isDbConnected) {
-        return res.status(503).json({ status: 'error', message: 'Database not connected' });
-    }
-    res.status(200).json({ status: 'ok', uptime: process.uptime() });
+    res.status(200).json({
+        status: 'ok',
+        uptime: process.uptime(),
+        database: isDbConnected ? 'connected' : 'disconnected'
+    });
 });
 
 app.get('/readyz', (req, res) => {
