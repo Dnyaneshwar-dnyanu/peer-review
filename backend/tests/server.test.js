@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
-const request = require('supertest');
-const app = require('../server');
+import { describe, it, expect, beforeAll } from 'vitest';
+import mongoose from 'mongoose';
+import request from 'supertest';
+import app from '../server.js'; // Make sure to add .js if your server file uses it
 
 describe('GET /', () => {
   it('should return 200 and a success message', async () => {
@@ -11,6 +12,12 @@ describe('GET /', () => {
 });
 
 describe('GET /healthz', () => {
+  beforeAll(async () => {
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(process.env.MONGO_URL);
+    }
+  });
+
   it('should return 200 and status ok', async () => {
     const res = await request(app).get('/healthz');
     expect(res.statusCode).toBe(200);
