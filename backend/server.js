@@ -65,8 +65,11 @@ app.use(cors({
 
         const normalizedOrigin = normalizeOrigin(origin);
 
-        if (allowedOrigins.length === 0 && process.env.NODE_ENV !== 'production') {
-            return callback(null, true);
+        if (allowedOrigins.length === 0) {
+            if (process.env.NODE_ENV !== 'production') {
+                return callback(null, true);
+            }
+            return callback(new Error('Not allowed by CORS: Origins not configured'));
         }
 
         if (allowedOrigins.includes(normalizedOrigin)) {
@@ -119,7 +122,10 @@ app.use((req, res, next) => {
     }
 
     if (allowedOrigins.length === 0) {
-        return next();
+        if (process.env.NODE_ENV !== 'production') {
+            return next();
+        }
+        return res.status(403).json({ success: false, message: 'Origin required but not configured' });
     }
 
     const requestOrigin = getRequestOrigin(req);
@@ -188,6 +194,10 @@ app.get("/metrics", async (req, res) => {
 });
 
 app.get('/healthz', (req, res) => {
+    const isDbConnected = mongoose.connection.readyState === 1;
+    if (!isDbConnected) {
+        return res.status(503).json({ status: 'error', message: 'Database not connected' });
+    }
     res.status(200).json({ status: 'ok', uptime: process.uptime() });
 });
 

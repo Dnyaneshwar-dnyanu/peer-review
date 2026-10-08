@@ -6,44 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const ExcelJS = require("exceljs");
 const logger = require('../utils/logger');
 
-const isUserIdMatch = (value, userId) => {
-    if (!value || !userId) return false;
-    return value.toString() === userId.toString();
-};
-
-const isProjectMember = (project, userId) => {
-    if (!project || !userId) return false;
-    const userIdStr = userId.toString();
-    const studentId = project.student?._id || project.student;
-
-    if (studentId && studentId.toString() === userIdStr) return true;
-
-    if (Array.isArray(project.members)) {
-        return project.members.some((member) => String(member.id) === userIdStr);
-    }
-
-    return false;
-};
-
-const canAccessRoom = (room, user) => {
-    if (!room || !user) return false;
-
-    if (user.role === 'admin') {
-        return isUserIdMatch(room.createdBy, user._id);
-    }
-
-    const isParticipant = room.participants?.some((participant) => {
-        const participantId = participant?._id || participant;
-        if (!participantId) return false;
-        return participantId.toString() === user._id.toString();
-    });
-
-    if (isParticipant) return true;
-
-    return Array.isArray(room.projects) && room.projects.some((project) =>
-        isProjectMember(project, user._id)
-    );
-};
+const { isUserIdMatch, isProjectMember, canAccessRoom } = require('../utils/accessHelpers');
 
 // --- Admin Services ---
 
@@ -75,6 +38,10 @@ module.exports.openClassroom = async (req, res) => {
         let room = await roomModel.findOne({ _id: req.params.roomID });
         if (!room) return res.status(404).json({ success: false, message: "Room not found" });
 
+        if (!isUserIdMatch(room.createdBy, req.user._id)) {
+            return res.status(403).json({ success: false, message: "Unauthorized: You do not own this room" });
+        }
+
         let code = uuidv4().slice(0, 6).toUpperCase();
         room.roomCode = code;
         room.status = "OPEN";
@@ -92,6 +59,10 @@ module.exports.closeClassroom = async (req, res) => {
     try {
         let room = await roomModel.findOne({ _id: req.params.roomID });
         if (!room) return res.status(404).json({ success: false, message: "Room not found" });
+
+        if (!isUserIdMatch(room.createdBy, req.user._id)) {
+            return res.status(403).json({ success: false, message: "Unauthorized: You do not own this room" });
+        }
 
         room.roomCode = "";
         room.status = "CLOSED";
@@ -120,13 +91,20 @@ module.exports.deleteClassroom = async (req, res) => {
             return res.status(404).json({ success: false, message: "Room not found" });
         }
 
-        // Delete reviews and projects in the room
-        await Promise.all(room.projects.map(async project => {
-            await reviewModel.deleteMany({
-                _id: { $in: project.reviews.map(r => r._id) }
-            });
-            await projectModel.deleteOne({ _id: project._id });
-        }));
+        if (!isUserIdMatch(room.createdBy, req.user._id)) {
+            return res.status(403).json({ success: false, message: "Unauthorized: You do not own this room" });
+        }
+
+        // Delete reviews and projects in the room in bulk (fixing N+1)
+        const projectIds = room.projects.map(p => p._id);
+        const reviewIds = room.projects.flatMap(p => p.reviews.map(r => r._id));
+        
+        if (reviewIds.length > 0) {
+            await reviewModel.deleteMany({ _id: { $in: reviewIds } });
+        }
+        if (projectIds.length > 0) {
+            await projectModel.deleteMany({ _id: { $in: projectIds } });
+        }
 
         await roomModel.findByIdAndDelete(roomID);
 
@@ -153,10 +131,14 @@ module.exports.exportEvalutionToExcel = async (req, res) => {
                     path: 'student',
                     select: 'name usn'
                 }
-            });
+            }).lean();
 
         if (!room) {
             return res.status(404).json({ success: false, message: 'Room not found' });
+        }
+
+        if (!isUserIdMatch(room.createdBy, req.user._id)) {
+            return res.status(403).json({ success: false, message: "Unauthorized: You do not own this room" });
         }
 
         const workbook = new ExcelJS.Workbook();
@@ -352,7 +334,7 @@ module.exports.getClassroomData = async (req, res) => {
                     path: 'student',
                     select: 'name usn'
                 }
-            });
+            }).lean();
 
         if (!room) return res.status(404).json({ success: false, message: "Room not found" });
 

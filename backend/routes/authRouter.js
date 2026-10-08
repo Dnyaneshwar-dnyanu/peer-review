@@ -4,10 +4,17 @@ const { validateUser } = require('../middleware/validateUser');
 const userModel = require('../models/User');
 
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // Limit each IP to 10 login requests per windowMs
+    message: { success: false, message: "Too many login attempts, please try again later." }
+});
 
 router.post('/register', registerUser);
 
-router.post('/login', loginUser);
+router.post('/login', loginLimiter, loginUser);
 
 router.post('/forgot-password', forgotPassword);
 

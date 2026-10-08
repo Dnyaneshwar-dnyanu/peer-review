@@ -13,7 +13,7 @@ const getCookieOptions = (maxAge) => {
     return {
         httpOnly: true,
         secure: isProd,
-        sameSite: isProd ? "none" : "lax",
+        sameSite: isProd ? "None" : "Lax",
         maxAge,
         path: "/",
     };
@@ -92,7 +92,8 @@ module.exports.registerUser = async (req, res) => {
 
 module.exports.loginUser = async (req, res) => {
     try {
-        let user = await userModel.findOne({ email: req.body.email });
+        const email = String(req.body.email || '').trim().toLowerCase();
+        let user = await userModel.findOne({ email });
 
         if (user) {
             const isMatch = await bcrypt.compare(req.body.password, user.password);
@@ -190,16 +191,6 @@ module.exports.refreshToken = async (req, res) => {
 
 module.exports.logoutUser = async (req, res) => {
     try {
-        if (req.user.role === 'admin') {
-            let rooms = await roomModel.find({ createdBy: req.user._id });
-            await Promise.all(rooms.map(async (room) => {
-                room.status = 'CLOSED';
-                room.roomCode = "";
-                room.participants = [];
-                await room.save();
-            }));
-        }
-
         await userModel.updateOne(
             { _id: req.user._id },
             { $unset: { refreshTokenHash: 1, refreshTokenExpires: 1 } }

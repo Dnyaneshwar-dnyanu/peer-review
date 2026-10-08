@@ -4,36 +4,7 @@ const roomModel = require('../models/Room');
 const reviewModel = require('../models/Reviews');   
 const logger = require('../utils/logger');
 
-const isUserIdMatch = (value, userId) => {
-    if (!value || !userId) return false;
-    return value.toString() === userId.toString();
-};
-
-const isProjectOwnerOrMember = (project, userId) => {
-    if (!project || !userId) return false;
-    const userIdStr = userId.toString();
-    const studentId = project.student?._id || project.student;
-
-    if (studentId && studentId.toString() === userIdStr) return true;
-
-    if (Array.isArray(project.members)) {
-        return project.members.some((member) => String(member.id) === userIdStr);
-    }
-
-    return false;
-};
-
-const canAccessRoom = (room, user) => {
-    if (!room || !user) return false;
-
-    if (user.role === 'admin') {
-        return isUserIdMatch(room.createdBy, user._id);
-    }
-
-    return room.participants?.some((participant) =>
-        participant.toString() === user._id.toString()
-    );
-};
+const { isUserIdMatch, isProjectMember, canAccessRoom } = require('../utils/accessHelpers');
 
 const getRoomForProject = (projectId) =>
     roomModel.findOne({ projects: projectId }).select('createdBy participants status');
@@ -56,7 +27,7 @@ module.exports.getProjectInfo = async (req, res) => {
         if (!project) return res.status(404).json({ success: false, message: "Project not found" });
 
         const room = await getRoomForProject(project._id);
-        const isOwnerOrMember = isProjectOwnerOrMember(project, req.user._id);
+        const isOwnerOrMember = isProjectMember(project, req.user._id);
 
         if (room) {
             const allowed = canAccessRoom(room, req.user) || isOwnerOrMember;
@@ -159,7 +130,7 @@ module.exports.getProjects = async (req, res) => {
 
         const allowedByRoom = canAccessRoom(room, req.user);
         const allowedByProject = room.projects?.some((project) =>
-            isProjectOwnerOrMember(project, req.user._id)
+            isProjectMember(project, req.user._id)
         );
 
         if (!allowedByRoom && !allowedByProject) {
@@ -188,7 +159,7 @@ module.exports.addReviewToProject = async (req, res) => {
         if (!project) return res.status(404).json({ success: false, message: "Project not found" });
 
         const room = await getRoomForProject(project._id);
-        const isOwnerOrMember = isProjectOwnerOrMember(project, req.user._id);
+        const isOwnerOrMember = isProjectMember(project, req.user._id);
 
         if (room) {
             const allowed = canAccessRoom(room, req.user) || isOwnerOrMember;
@@ -218,6 +189,12 @@ module.exports.addReviewToProject = async (req, res) => {
             return res.status(400).json({ success: false, message: "Marks must be a number" });
         }
 
+        if (room && typeof room.maxMarks === 'number') {
+            if (marksValue < 0 || marksValue > room.maxMarks) {
+                return res.status(400).json({ success: false, message: `Marks must be between 0 and ${room.maxMarks}` });
+            }
+        }
+
         let reviewAdded = await reviewModel.create({
             projectID: req.params.projectID,
             reviewerID: req.user._id,
@@ -226,9 +203,16 @@ module.exports.addReviewToProject = async (req, res) => {
         });
 
         project.reviews.push(reviewAdded._id);
-        const reviewCount = project.reviews.length - 1;
-        project.avgMarks = ((project.avgMarks || 0) * reviewCount + marksValue) / (reviewCount + 1);
         await project.save();
+
+        const stats = await reviewModel.aggregate([
+            { $match: { projectID: project._id } },
+            { $group: { _id: "$projectID", avg: { $avg: "$marks" } } }
+        ]);
+        
+        const newAvg = stats.length > 0 ? stats[0].avg : 0;
+        await projectModel.updateOne({ _id: project._id }, { $set: { avgMarks: newAvg } });
+
 
         res.status(200).json({ success: true, message: "Review added successfully!" });
     } catch (err) {
@@ -243,7 +227,7 @@ module.exports.getReviews = async (req, res) => {
         if (!project) return res.status(404).json({ success: false, message: "Project not found" });
 
         const room = await getRoomForProject(project._id);
-        const isOwnerOrMember = isProjectOwnerOrMember(project, req.user._id);
+        const isOwnerOrMember = isProjectMember(project, req.user._id);
 
         if (room) {
             const allowed = canAccessRoom(room, req.user) || isOwnerOrMember;
@@ -269,7 +253,7 @@ module.exports.getReviewStatus = async (req, res) => {
         if (!project) return res.status(404).json({ success: false, message: "Project not found" });
 
         const room = await getRoomForProject(project._id);
-        const isOwnerOrMember = isProjectOwnerOrMember(project, req.user._id);
+        const isOwnerOrMember = isProjectMember(project, req.user._id);
 
         if (room) {
             const allowed = canAccessRoom(room, req.user) || isOwnerOrMember;
@@ -302,13 +286,17 @@ module.exports.updateProject = async (req, res) => {
             });
         }
 
-        let project = await projectModel.findOneAndUpdate(
-            { _id: req.params.projectID },
-            { $set: { title: title, description: description } },
-            { new: true }
-        );
-
+        let project = await projectModel.findById(req.params.projectID);
         if (!project) return res.status(404).json({ success: false, message: "Project not found" });
+
+        const room = await getRoomForProject(project._id);
+        if (room && !isUserIdMatch(room.createdBy, req.user._id)) {
+            return res.status(403).json({ success: false, message: "Unauthorized: You do not own this room" });
+        }
+
+        project.title = title;
+        project.description = description;
+        await project.save();
 
         res.status(200).json({ success: true, message: "Project details updated successfully!" });
     } catch (err) {
@@ -332,6 +320,10 @@ module.exports.deleteProject = async (req, res) => {
                 success: false,
                 message: "Project cannot be deleted while room is active"
             });
+        }
+
+        if (req.user.role === 'admin' && room && !isUserIdMatch(room.createdBy, req.user._id)) {
+            return res.status(403).json({ success: false, message: "Unauthorized" });
         }
 
         // Deletion access check (student can delete if not in room and they own it, or admin)

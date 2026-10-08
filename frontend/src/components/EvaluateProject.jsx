@@ -44,9 +44,17 @@ function EvaluateForm({ project, maxMarks }) {
 
         init();
 
-        let interval = setInterval(getComments, 3000);
+        let timeoutId;
+        const poll = () => {
+            timeoutId = setTimeout(async () => {
+                await getComments();
+                poll();
+            }, 3000);
+        };
 
-        return () => clearInterval(interval);
+        poll();
+
+        return () => clearTimeout(timeoutId);
 
     }, [project?._id, isProjectValid]);
 

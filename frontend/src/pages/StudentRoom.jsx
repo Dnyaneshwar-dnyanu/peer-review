@@ -41,7 +41,7 @@ function StudentRoom() {
      }
 
      useEffect(() => {
-          let interval;
+          let timeoutId;
           let isFetching = false;
 
           const getRoomData = async () => {
@@ -84,11 +84,14 @@ function StudentRoom() {
                }
           };
 
-          getRoomData();
+          const poll = async () => {
+               await getRoomData();
+               timeoutId = setTimeout(poll, 5000);
+          };
 
-          interval = setInterval(getRoomData, 5000);
+          poll();
 
-          return () => clearInterval(interval);
+          return () => clearTimeout(timeoutId);
 
      }, [roomID, navigate]);
 
