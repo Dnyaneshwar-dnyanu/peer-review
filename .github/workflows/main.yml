@@ -74,6 +74,7 @@ jobs:
         working-directory: backend
         env:
           NODE_ENV: test
+          MONGO_URL: ${{ secrets.MONGO_URL }}
 
   test-frontend:
     name: Frontend - Lint, Test & Build
